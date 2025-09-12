@@ -23,7 +23,7 @@ const ContactPage = () => {
           </p>
           <div className='mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-2 sm:px-0'>
             <a
-              href='mailto:support@expensetracker-ai.com'
+              href='mailto:vanshshah174@gmail.com'
               className='group relative overflow-hidden bg-gradient-to-r from-emerald-600 via-green-500 to-teal-500 hover:from-emerald-700 hover:via-green-600 hover:to-teal-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-semibold shadow-2xl hover:shadow-3xl transition-all duration-200 transform hover:-translate-y-0.5'
             >
               <span className='relative z-10 flex items-center justify-center gap-2'>
@@ -33,7 +33,7 @@ const ContactPage = () => {
               <div className='absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200'></div>
             </a>
             <a
-              href='tel:+11234567890'
+              href='tel:+13437773855'
               className='group border-2 border-emerald-500/20 dark:border-emerald-400/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-semibold transition-all duration-200 backdrop-blur-sm flex items-center justify-center gap-2'
             >
               Call Us
@@ -79,11 +79,11 @@ const ContactPage = () => {
                   respond within 24 hours.
                 </p>
                 <a
-                  href='mailto:support@expensetracker-ai.com'
+                  href='mailto:vanshshah174@gmail.com'
                   className='inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium transition-colors duration-200 text-sm sm:text-base break-all sm:break-normal'
                 >
                   <span className='hidden sm:inline'>
-                    support@expensetracker-ai.com
+                    vanshshah174@gmail.com
                   </span>
                   <span className='sm:hidden'>Email Us</span>
                   <span className='text-sm'>→</span>
@@ -105,10 +105,10 @@ const ContactPage = () => {
                   with urgent matters.
                 </p>
                 <a
-                  href='tel:+11234567890'
+                  href='tel:+13437773855'
                   className='inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium transition-colors duration-200 text-sm sm:text-base'
                 >
-                  +1 (123) 456-7890
+                  +1 (343) 777-3855
                   <span className='text-sm'>→</span>
                 </a>
               </div>
@@ -167,11 +167,11 @@ const ContactPage = () => {
               <div className='space-y-2 text-sm sm:text-base text-gray-600 dark:text-gray-400'>
                 <div className='flex justify-between'>
                   <span>Monday - Friday:</span>
-                  <span className='font-medium'>9:00 AM - 6:00 PM PST</span>
+                  <span className='font-medium'>9:00 AM - 6:00 PM EST</span>
                 </div>
                 <div className='flex justify-between'>
                   <span>Saturday:</span>
-                  <span className='font-medium'>10:00 AM - 4:00 PM PST</span>
+                  <span className='font-medium'>10:00 AM - 4:00 PM EST</span>
                 </div>
                 <div className='flex justify-between'>
                   <span>Sunday:</span>
