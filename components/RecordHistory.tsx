@@ -1,9 +1,26 @@
-import getRecords from '@/app/actions/getRecords';
+'use client';
+
 import RecordItem from './RecordItem';
 import { Record } from '@/types/Record';
+import { useExpenseRecords } from '@/lib/hooks/useExpenseData';
 
-const RecordHistory = async () => {
-  const { records, error } = await getRecords();
+const RecordHistory = () => {
+  const { data: records = [], error, isLoading: loading } = useExpenseRecords();
+
+  if (loading) {
+    return (
+      <div className='bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 sm:p-6 rounded-2xl shadow-xl border border-gray-100/50 dark:border-gray-700/50'>
+        <div className='animate-pulse space-y-4'>
+          <div className='h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/3'></div>
+          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4'>
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className='h-24 bg-gray-200 dark:bg-gray-700 rounded-xl'></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (error) {
     return (
@@ -70,18 +87,28 @@ const RecordHistory = async () => {
     );
   }
 
+  const totalExpenses = records.reduce((sum, record) => sum + record.amount, 0);
+
   return (
     <div className='bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 sm:p-6 rounded-2xl shadow-xl border border-gray-100/50 dark:border-gray-700/50 hover:shadow-2xl'>
-      <div className='flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6'>
-        <div className='w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-emerald-500 via-green-500 to-teal-500 rounded-xl flex items-center justify-center shadow-lg'>
-          <span className='text-white text-sm sm:text-lg'>📝</span>
+      <div className='flex items-center justify-between mb-4 sm:mb-6'>
+        <div className='flex items-center gap-2 sm:gap-3'>
+          <div className='w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-emerald-500 via-green-500 to-teal-500 rounded-xl flex items-center justify-center shadow-lg'>
+            <span className='text-white text-sm sm:text-lg'>📝</span>
+          </div>
+          <div>
+            <h3 className='text-lg sm:text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-300 bg-clip-text text-transparent'>
+              Expense History
+            </h3>
+            <p className='text-xs text-gray-500 dark:text-gray-400 mt-0.5'>
+              Your spending timeline
+            </p>
+          </div>
         </div>
-        <div>
-          <h3 className='text-lg sm:text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-300 bg-clip-text text-transparent'>
-            Expense History
-          </h3>
-          <p className='text-xs text-gray-500 dark:text-gray-400 mt-0.5'>
-            Your spending timeline
+        <div className='text-right'>
+          <p className='text-xs text-gray-500 dark:text-gray-400 mb-1'>Total Expenses</p>
+          <p className='text-xl sm:text-2xl font-bold bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent'>
+            ${totalExpenses.toFixed(2)}
           </p>
         </div>
       </div>
