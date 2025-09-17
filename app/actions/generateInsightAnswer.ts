@@ -2,7 +2,7 @@
 
 import { checkUser } from '@/lib/checkUser';
 import { db } from '@/lib/db';
-import { generateAIAnswer } from '@/lib/ai';
+import { generateAIAnswer, ExpenseRecord } from '@/lib/ai';
 import { getQuickFAQAnswer, getCachedFAQ, cacheFAQ, getCachedUserSpending, cacheUserSpending } from '@/lib/cache/cache';
 import { detectUserIntent } from '@/lib/chatbot/intent-detector';
 
@@ -34,7 +34,7 @@ export async function generateInsightAnswer(question: string): Promise<string> {
     }
 
     // Check cached user spending data
-    let expenseData = await getCachedUserSpending(user.clerkUserId);
+    let expenseData = await getCachedUserSpending(user.clerkUserId) as ExpenseRecord[] | null;
     
     if (!expenseData) {
       // Get user's recent expenses (last 30 days)
@@ -68,7 +68,7 @@ export async function generateInsightAnswer(question: string): Promise<string> {
     }
 
     // Generate AI answer with user data
-    const answer = await generateAIAnswer(question, expenseData);
+    const answer = await generateAIAnswer(question, expenseData || []);
     
     // Add debug info if using real data
     const debugAnswer = expenseData.length > 0 

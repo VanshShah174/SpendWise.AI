@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
 
     // Get conversation history from cache
     const cacheKey = `conversation:${user.id}:${conversationId || 'default'}`;
-    let conversationHistory: ChatMessage[] = (await getConversation(cacheKey)) || [];
+    const conversationHistory: ChatMessage[] = (await getConversation(cacheKey)) || [];
 
     // Add user message to history
     const userMessage: ChatMessage = {
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       // Continue expense conversation only if not starting a new intent
       const result = await handleExpenseConversation(user.id, conversationId || 'default', message);
       response = result.response;
-      expenseAdded = result.expenseAdded;
+      expenseAdded = result.expenseAdded ?? null;
     } else if (editState && intent.type !== 'modify_expense' && intent.type !== 'show_expenses') {
       // Handle edit conversation only if not starting a new intent
       if (intent.type === 'change_field' && intent.field && intent.newValue) {
@@ -147,24 +147,13 @@ export async function POST(request: NextRequest) {
 function parseExpenseQuery(message: string): ExpenseQuery {
   const lowerMessage = message.toLowerCase();
   
-  // Spending queries
-  if (lowerMessage.includes('spent') || lowerMessage.includes('spending') || 
-      lowerMessage.includes('expense') || lowerMessage.includes('expenses') ||
-      lowerMessage.includes('cost') || lowerMessage.includes('paid')) {
+  // Check for show/view queries first (highest priority)
+  if (lowerMessage.includes('show') || lowerMessage.includes('recent') || 
+      lowerMessage.includes('my expenses') || lowerMessage.includes('biggest') ||
+      lowerMessage.includes('what') || lowerMessage.includes('how much')) {
     return {
-      type: 'spending',
-      parameters: extractSpendingParameters(lowerMessage),
-    };
-  }
-  
-  // Category queries
-  if (lowerMessage.includes('category') || lowerMessage.includes('categories') ||
-      lowerMessage.includes('food') || lowerMessage.includes('transport') || 
-      lowerMessage.includes('shopping') || lowerMessage.includes('entertainment') ||
-      lowerMessage.includes('bills') || lowerMessage.includes('healthcare')) {
-    return {
-      type: 'category',
-      parameters: extractCategoryParameters(lowerMessage),
+      type: 'analysis',
+      parameters: { originalMessage: message },
     };
   }
   
@@ -174,7 +163,23 @@ function parseExpenseQuery(message: string): ExpenseQuery {
       lowerMessage.includes('summary') || lowerMessage.includes('overview')) {
     return {
       type: 'analysis',
-      parameters: {},
+      parameters: { originalMessage: message },
+    };
+  }
+  
+  // Category queries
+  if (lowerMessage.includes('category') || lowerMessage.includes('categories')) {
+    return {
+      type: 'category',
+      parameters: { originalMessage: message },
+    };
+  }
+  
+  // Spending queries
+  if (lowerMessage.includes('spent') || lowerMessage.includes('spending')) {
+    return {
+      type: 'spending',
+      parameters: { originalMessage: message },
     };
   }
   
@@ -307,7 +312,7 @@ async function handleSpendingQuery(userId: string, params: Record<string, unknow
   const timeframe = params.timeframe || 'month';
   const category = params.category;
   
-  let whereClause: Record<string, unknown> = {
+  const whereClause: Record<string, unknown> = {
     userId: userId,
   };
   
@@ -427,7 +432,7 @@ async function handleCategoryQuery(userId: string, params: Record<string, unknow
 
 
 
-async function handleAnalysisQuery(userId: string, params: Record<string, unknown>): Promise<string> {
+async function handleAnalysisQuery(userId: string, _params: Record<string, unknown>): Promise<string> {
   try {
     // Get comprehensive expense data
     const allExpenses = await db.record.findMany({
