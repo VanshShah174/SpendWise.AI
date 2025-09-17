@@ -20,7 +20,7 @@ const AboutPage = () => {
           </h1>
           <p className='text-base sm:text-lg md:text-xl lg:text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed px-2 sm:px-0'>
             Your intelligent AI chatbot companion for conversational expense tracking,
-            smart categorization, and lightning-fast financial insights with Redis caching.
+            smart categorization, and precise date-filtered financial insights with Redis caching.
           </p>
           <div className='mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-2 sm:px-0'>
             <Link
@@ -250,7 +250,7 @@ const AboutPage = () => {
                   
                   <div className='bg-white dark:bg-gray-700 p-4 rounded-xl border border-gray-200 dark:border-gray-600'>
                     <div className='text-green-600 dark:text-green-400 font-medium text-sm mb-1'>Analysis</div>
-                    <div className='text-gray-800 dark:text-gray-200'>&quot;What is my biggest expense category?&quot;</div>
+                    <div className='text-gray-800 dark:text-gray-200'>&quot;How much did I spend in July?&quot;</div>
                   </div>
                   
                   <div className='bg-white dark:bg-gray-700 p-4 rounded-xl border border-gray-200 dark:border-gray-600'>

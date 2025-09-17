@@ -19,7 +19,7 @@ const ContactPage = () => {
           </h1>
           <p className='text-base sm:text-lg md:text-xl lg:text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed px-2 sm:px-0'>
             Need help with our AI chatbot or conversational expense tracking?
-            Get instant support for Redis caching, natural language features, and more!
+            Get instant support for Redis caching, date filtering, natural language features, and more!
           </p>
           <div className='mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-2 sm:px-0'>
             <a
