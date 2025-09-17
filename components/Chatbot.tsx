@@ -222,11 +222,11 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onToggle }) => {
   };
 
   const handleAddExpense = () => {
-    handleQuickQuestion('add expense');
+    handleQuickQuestion('Add Expense');
   };
 
   const handleEditRemove = () => {
-    handleQuickQuestion('edit remove');
+    handleQuickQuestion('Edit/Remove Expense');
   };
 
   const formatMessage = (content: string) => {

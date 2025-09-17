@@ -86,6 +86,52 @@ export function parseDate(input: string): string {
     return `${year}-${month}-${day}`;
   }
   
+  // Handle specific patterns like "1st august", "2nd july", etc.
+  const ordinalPattern = /(\d+)(st|nd|rd|th)\s+(january|february|march|april|may|june|july|august|september|october|november|december)/i;
+  const ordinalMatch = input.match(ordinalPattern);
+  if (ordinalMatch) {
+    const day = parseInt(ordinalMatch[1]);
+    const monthName = ordinalMatch[3].toLowerCase();
+    const monthMap: Record<string, number> = {
+      january: 0, february: 1, march: 2, april: 3, may: 4, june: 5,
+      july: 6, august: 7, september: 8, october: 9, november: 10, december: 11
+    };
+    const month = monthMap[monthName];
+    const year = currentYear;
+    
+    const resultDate = new Date(year, month, day);
+    const resultYear = resultDate.getFullYear();
+    const resultMonth = String(resultDate.getMonth() + 1).padStart(2, '0');
+    const resultDay = String(resultDate.getDate()).padStart(2, '0');
+    console.log(`Parsed ordinal "${input}" to ${resultYear}-${resultMonth}-${resultDay}`);
+    return `${resultYear}-${resultMonth}-${resultDay}`;
+  }
+  
+  // Try to parse natural language dates like "4th July, 2025" or "July 4, 2025"
+  try {
+    // Handle ordinal dates like "4th July, 2025"
+    let cleanInput = input
+      .replace(/(\d+)(st|nd|rd|th)/gi, '$1') // Remove ordinals
+      .replace(/,/g, '') // Remove commas
+      .trim();
+    
+    // If no year specified, add current year
+    if (!/\d{4}/.test(cleanInput)) {
+      cleanInput += ` ${new Date().getFullYear()}`;
+    }
+    
+    const parsedDate = new Date(cleanInput);
+    if (!isNaN(parsedDate.getTime()) && parsedDate.getFullYear() > 1900) {
+      const year = parsedDate.getFullYear();
+      const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
+      const day = String(parsedDate.getDate()).padStart(2, '0');
+      console.log(`Parsed "${input}" to ${year}-${month}-${day}`);
+      return `${year}-${month}-${day}`;
+    }
+  } catch (error) {
+    console.log(`Failed to parse "${input}" as natural date:`, error);
+  }
+  
   // Try to parse date formats
   const dateMatch = input.match(/(\d{4}-\d{2}-\d{2})|(\d{1,2}\/\d{1,2}\/\d{4})|(\d{1,2}-\d{1,2}-\d{4})/);
   if (dateMatch) {
@@ -113,6 +159,7 @@ export function parseDate(input: string): string {
     return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
   }
   
+  console.log(`Could not parse date "${input}", defaulting to today`);
   // Default to today
   const year = currentYear;
   const month = String(currentMonth + 1).padStart(2, '0');

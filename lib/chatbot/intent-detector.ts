@@ -1,5 +1,5 @@
 export interface UserIntent {
-  type: 'add_expense' | 'analyze_expenses' | 'general_advice' | 'modify_expense' | 'show_expenses' | 'delete_expense' | 'edit_expense' | 'change_field' | 'unknown';
+  type: 'add_expense' | 'analyze_expenses' | 'general_advice' | 'modify_expense' | 'show_expenses' | 'delete_expense' | 'edit_expense' | 'change_field' | 'smart_delete' | 'smart_edit' | 'unknown';
   confidence: number;
   response?: string;
   startConversation?: boolean;
@@ -57,6 +57,42 @@ export function detectUserIntent(question: string): UserIntent {
     'how to save', 'budget tips', 'financial advice', 'money saving', 
     'reduce expenses', 'cut costs'
   ];
+
+  // Check for smart delete patterns (highest priority)
+  const smartDeletePatterns = [
+    /(delete|remove).*expense.*(on|from|spent on)\s+\w+/,
+    /want to delete.*expense.*(on|from)\s+\w+/,
+    /(delete|remove).*spent.*(on|from)\s+\w+/,
+    /(delete|remove).*(today|yesterday|\d+th|\d+st|\d+nd|\d+rd)/
+  ];
+  
+  for (const pattern of smartDeletePatterns) {
+    if (pattern.test(lowerQuestion)) {
+      return {
+        type: 'smart_delete',
+        confidence: 0.95,
+        startConversation: true
+      };
+    }
+  }
+  
+  // Check for smart edit patterns (highest priority)
+  const smartEditPatterns = [
+    /(edit|modify|change|update).*expense.*(on|from|spent on)\s+\w+/,
+    /want to (edit|update).*expense.*(on|from)\s+\w+/,
+    /(edit|modify|change|update).*spent.*(on|from)\s+\w+/,
+    /(edit|modify|change|update).*(today|yesterday|\d+th|\d+st|\d+nd|\d+rd)/
+  ];
+  
+  for (const pattern of smartEditPatterns) {
+    if (pattern.test(lowerQuestion)) {
+      return {
+        type: 'smart_edit',
+        confidence: 0.95,
+        startConversation: true
+      };
+    }
+  }
 
   // Check for edit expense intent (e.g., "edit 1", "modify 2")
   const editMatch = lowerQuestion.match(/(?:edit|modify)\s+(\d+)/);
