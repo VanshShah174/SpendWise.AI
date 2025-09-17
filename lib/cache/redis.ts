@@ -23,9 +23,14 @@ function buildRedisClient(): Redis {
     },
   };
 
-  // 🚫 No opts.tls for non-TLS
+  // TLS configuration for Redis Cloud
   if ((process.env.REDIS_TLS || "").toLowerCase() === "true") {
-    opts.tls = {}; // only if you ever switch to a TLS port later
+    opts.tls = {
+      rejectUnauthorized: false,
+      requestCert: true,
+      agent: false
+    };
+    opts.family = 4; // Force IPv4
   }
 
   return new Redis(opts);
@@ -35,19 +40,30 @@ export function getRedisClient(): Redis | null {
   if (connectionAttempted) return redis;
   connectionAttempted = true;
 
+  console.log("🔍 REDIS DEBUG:", {
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT,
+    hasPassword: !!process.env.REDIS_PASSWORD,
+    tls: process.env.REDIS_TLS
+  });
+
   if (!process.env.REDIS_HOST) {
-    console.log("Redis not configured");
+    console.log("❌ Redis not configured");
     return null;
   }
 
   try {
+    console.log("🔄 Creating Redis client...");
     redis = buildRedisClient();
     redis.on("connect", () => console.log("✅ Redis connected"));
-    redis.on("error", (err) => console.warn("Redis error:", err?.message || err));
+    redis.on("ready", () => console.log("🚀 Redis ready"));
+    redis.on("error", (err) => console.warn("❌ Redis error:", err?.message || err));
     redis.on("end", () => console.warn("🔌 Redis connection closed"));
+    redis.on("reconnecting", () => console.log("🔄 Redis reconnecting..."));
+    console.log("✅ Redis client created, status:", redis.status);
     return redis;
   } catch (error: unknown) {
-    console.warn("Redis init failed:", error instanceof Error ? error.message : error);
+    console.warn("❌ Redis init failed:", error instanceof Error ? error.message : error);
     redis = null;
     return null;
   }
@@ -55,18 +71,26 @@ export function getRedisClient(): Redis | null {
 
 async function isRedisConnected(client: Redis): Promise<boolean> {
   try {
-    if (client.status !== 'ready') return false;
-    await client.ping();
+    console.log("🔍 Checking Redis status:", client.status);
+    if (client.status !== 'ready') {
+      console.log("⏳ Redis not ready, attempting connection...");
+      await client.connect();
+    }
+    const result = await client.ping();
+    console.log("🏓 Redis ping result:", result);
     return true;
-  } catch {
+  } catch (error) {
+    console.log("❌ Redis connection failed:", error instanceof Error ? error.message : error);
     return false;
   }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function cacheConversation(key: string, messages: any[], ttl = 86400) {
+  console.log("💾 Caching conversation:", key);
   const client = getRedisClient();
   if (!client || useMemoryFallback || !(await isRedisConnected(client))) {
+    console.log("🧠 Using memory cache for:", key);
     setMemoryCache(key, messages, ttl);
     return true;
   }

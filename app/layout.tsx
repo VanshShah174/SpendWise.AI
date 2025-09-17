@@ -6,6 +6,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { ExpenseProvider } from '@/contexts/ExpenseContext';
+import { ChatbotProvider } from '@/contexts/ChatbotContext';
 import { QueryProvider } from '@/components/QueryProvider';
 
 const geistSans = Geist({
@@ -53,11 +54,13 @@ export default function RootLayout({
         <QueryProvider>
           <ThemeProvider>
             <ExpenseProvider>
-              <ClerkThemeProvider>
-                <Navbar />
-                {children}
-                <Footer />
-              </ClerkThemeProvider>
+              <ChatbotProvider>
+                <ClerkThemeProvider>
+                  <Navbar />
+                  {children}
+                  <Footer />
+                </ClerkThemeProvider>
+              </ChatbotProvider>
             </ExpenseProvider>
           </ThemeProvider>
         </QueryProvider>
