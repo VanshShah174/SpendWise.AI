@@ -19,8 +19,8 @@ const AboutPage = () => {
             </span>
           </h1>
           <p className='text-base sm:text-lg md:text-xl lg:text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed px-2 sm:px-0'>
-            Your intelligent companion for tracking expenses and managing your
-            finances with cutting-edge AI-powered insights.
+            Your intelligent AI chatbot companion for conversational expense tracking,
+            smart categorization, and lightning-fast financial insights with Redis caching.
           </p>
           <div className='mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-2 sm:px-0'>
             <Link
@@ -53,11 +53,10 @@ const AboutPage = () => {
             <span className='text-emerald-600 dark:text-emerald-400'>AI</span>
           </h2>
           <p className='text-lg md:text-xl text-gray-600 dark:text-gray-400 leading-relaxed max-w-3xl mx-auto'>
-            At SpendWise.AI, we leverage cutting-edge artificial
-            intelligence to revolutionize how individuals achieve financial
-            wellness. Our AI analyzes your spending patterns to deliver
-            personalized recommendations and actionable insights that lead to
-            better budgeting and financial freedom.
+            At SpendWise.AI, we combine conversational AI with intelligent caching
+            to create the most intuitive expense tracking experience. Chat naturally
+            with our AI assistant, get instant responses with Redis optimization,
+            and enjoy personalized insights that adapt to your financial habits.
           </p>
           <div className='mt-10 grid grid-cols-1 md:grid-cols-3 gap-6'>
             <div className='bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 p-6 rounded-2xl border border-emerald-100 dark:border-emerald-800/50'>
@@ -113,15 +112,15 @@ const AboutPage = () => {
               <div className='absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-green-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-200'></div>
               <div className='relative z-10'>
                 <div className='w-12 h-12 bg-gradient-to-br from-emerald-500 via-green-500 to-teal-500 rounded-xl flex items-center justify-center shadow-lg mb-6'>
-                  <span className='text-white text-xl'>🤖</span>
+                  <span className='text-white text-xl'>💬</span>
                 </div>
                 <h3 className='text-xl font-bold mb-4 text-gray-900 dark:text-gray-100'>
-                  AI-Powered Insights
+                  AI Chatbot Assistant
                 </h3>
                 <p className='text-gray-600 dark:text-gray-400 leading-relaxed'>
-                  Get intelligent analysis of your spending patterns with
-                  personalized AI recommendations and automated category
-                  suggestions that learn from your behavior.
+                  Chat naturally with our AI assistant to add expenses, analyze spending,
+                  and get personalized insights. Just say &quot;I spent $15 on coffee&quot; and
+                  watch the magic happen with smart categorization.
                 </p>
               </div>
             </div>
@@ -130,15 +129,15 @@ const AboutPage = () => {
               <div className='absolute inset-0 bg-gradient-to-br from-green-500/5 to-teal-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-200'></div>
               <div className='relative z-10'>
                 <div className='w-12 h-12 bg-gradient-to-br from-green-500 via-teal-500 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg mb-6'>
-                  <span className='text-white text-xl'>✨</span>
+                  <span className='text-white text-xl'>⚡</span>
                 </div>
                 <h3 className='text-xl font-bold mb-4 text-gray-900 dark:text-gray-100'>
-                  Smart Categorization
+                  Lightning-Fast Performance
                 </h3>
                 <p className='text-gray-600 dark:text-gray-400 leading-relaxed'>
-                  Let our AI automatically categorize your expenses with 99%
-                  accuracy and provide tailored recommendations to enhance your
-                  budget management effortlessly.
+                  Experience instant responses with Redis caching and intelligent
+                  memory fallback. Conversation history, FAQ responses, and insights
+                  load instantly with optimized React Query integration.
                 </p>
               </div>
             </div>
@@ -147,16 +146,123 @@ const AboutPage = () => {
               <div className='absolute inset-0 bg-gradient-to-br from-teal-500/5 to-emerald-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-200'></div>
               <div className='relative z-10'>
                 <div className='w-12 h-12 bg-gradient-to-br from-teal-500 via-emerald-500 to-green-500 rounded-xl flex items-center justify-center shadow-lg mb-6'>
-                  <span className='text-white text-xl'>📊</span>
+                  <span className='text-white text-xl'>🧠</span>
                 </div>
                 <h3 className='text-xl font-bold mb-4 text-gray-900 dark:text-gray-100'>
-                  Intelligent Dashboard
+                  Smart Intent Detection
                 </h3>
                 <p className='text-gray-600 dark:text-gray-400 leading-relaxed'>
-                  Experience a modern, AI-enhanced interface with real-time
-                  insights, interactive financial analytics, and beautiful
-                  visualizations that make sense of your data.
+                  Our AI understands your intentions whether you want to add expenses,
+                  analyze spending, or get budget tips. Multi-turn conversations with
+                  context awareness make financial management effortless.
                 </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* AI Features Section */}
+      <section className='py-20 px-8 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm relative overflow-hidden'>
+        <div className='absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500'></div>
+        <div className='max-w-6xl mx-auto'>
+          <div className='text-center mb-16'>
+            <div className='inline-flex items-center gap-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-3 py-1 rounded-full text-sm font-medium mb-6'>
+              <span className='w-1.5 h-1.5 bg-emerald-500 dark:bg-emerald-400 rounded-full'></span>
+              AI Technology
+            </div>
+            <h2 className='text-4xl md:text-5xl font-bold mb-6 text-gray-900 dark:text-gray-100'>
+              Conversational{' '}
+              <span className='text-emerald-600 dark:text-emerald-400'>
+                Finance Management
+              </span>
+            </h2>
+            <p className='text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto'>
+              Experience the future of expense tracking with natural language processing,
+              intelligent caching, and real-time AI insights.
+            </p>
+          </div>
+
+          <div className='grid grid-cols-1 lg:grid-cols-2 gap-12 items-center'>
+            <div className='space-y-8'>
+              <div className='bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 p-6 rounded-2xl border border-emerald-100 dark:border-emerald-800/50'>
+                <div className='flex items-center gap-3 mb-4'>
+                  <div className='w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center'>
+                    <span className='text-white text-sm'>💬</span>
+                  </div>
+                  <h3 className='text-lg font-bold text-gray-900 dark:text-gray-100'>
+                    Natural Language Processing
+                  </h3>
+                </div>
+                <p className='text-gray-600 dark:text-gray-400'>
+                  Simply chat: &quot;I spent $25 on groceries&quot; and our AI handles the rest
+                  with automatic categorization and smart insights.
+                </p>
+              </div>
+
+              <div className='bg-gradient-to-br from-green-50 to-teal-50 dark:from-green-900/20 dark:to-teal-900/20 p-6 rounded-2xl border border-green-100 dark:border-green-800/50'>
+                <div className='flex items-center gap-3 mb-4'>
+                  <div className='w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center'>
+                    <span className='text-white text-sm'>⚡</span>
+                  </div>
+                  <h3 className='text-lg font-bold text-gray-900 dark:text-gray-100'>
+                    Redis-Powered Caching
+                  </h3>
+                </div>
+                <p className='text-gray-600 dark:text-gray-400'>
+                  Lightning-fast responses with intelligent caching and automatic
+                  fallback to memory when Redis is unavailable.
+                </p>
+              </div>
+
+              <div className='bg-gradient-to-br from-teal-50 to-emerald-50 dark:from-teal-900/20 dark:to-emerald-900/20 p-6 rounded-2xl border border-teal-100 dark:border-teal-800/50'>
+                <div className='flex items-center gap-3 mb-4'>
+                  <div className='w-8 h-8 bg-teal-500 rounded-lg flex items-center justify-center'>
+                    <span className='text-white text-sm'>🧠</span>
+                  </div>
+                  <h3 className='text-lg font-bold text-gray-900 dark:text-gray-100'>
+                    Context-Aware Conversations
+                  </h3>
+                </div>
+                <p className='text-gray-600 dark:text-gray-400'>
+                  Multi-turn conversations with persistent state management.
+                  Edit expenses, analyze trends, all through natural dialogue.
+                </p>
+              </div>
+            </div>
+
+            <div className='bg-gradient-to-br from-gray-50 to-emerald-50 dark:from-gray-800 dark:to-emerald-900/20 p-8 rounded-2xl border border-gray-200 dark:border-gray-700'>
+              <div className='space-y-6'>
+                <div className='text-center mb-6'>
+                  <h3 className='text-xl font-bold text-gray-900 dark:text-gray-100 mb-2'>
+                    Try These Commands
+                  </h3>
+                  <p className='text-gray-600 dark:text-gray-400 text-sm'>
+                    Natural language examples our AI understands
+                  </p>
+                </div>
+                
+                <div className='space-y-4'>
+                  <div className='bg-white dark:bg-gray-700 p-4 rounded-xl border border-gray-200 dark:border-gray-600'>
+                    <div className='text-emerald-600 dark:text-emerald-400 font-medium text-sm mb-1'>Adding Expenses</div>
+                    <div className='text-gray-800 dark:text-gray-200'>&quot;I spent $15 on coffee this morning&quot;</div>
+                  </div>
+                  
+                  <div className='bg-white dark:bg-gray-700 p-4 rounded-xl border border-gray-200 dark:border-gray-600'>
+                    <div className='text-green-600 dark:text-green-400 font-medium text-sm mb-1'>Analysis</div>
+                    <div className='text-gray-800 dark:text-gray-200'>&quot;What is my biggest expense category?&quot;</div>
+                  </div>
+                  
+                  <div className='bg-white dark:bg-gray-700 p-4 rounded-xl border border-gray-200 dark:border-gray-600'>
+                    <div className='text-teal-600 dark:text-teal-400 font-medium text-sm mb-1'>Editing</div>
+                    <div className='text-gray-800 dark:text-gray-200'>&quot;Change expense 1 amount to $20&quot;</div>
+                  </div>
+                  
+                  <div className='bg-white dark:bg-gray-700 p-4 rounded-xl border border-gray-200 dark:border-gray-600'>
+                    <div className='text-emerald-600 dark:text-emerald-400 font-medium text-sm mb-1'>Insights</div>
+                    <div className='text-gray-800 dark:text-gray-200'>&quot;Give me budget tips for this month&quot;</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -185,17 +291,16 @@ const AboutPage = () => {
           <div className='grid grid-cols-1 md:grid-cols-2 gap-12 items-center'>
             <div className='space-y-6'>
               <p className='text-lg text-gray-600 dark:text-gray-400 leading-relaxed'>
-                SpendWise.AI was born from the vision of creating truly
-                intelligent financial management tools. Our team of financial
-                experts, data scientists, and technologists came together to
-                solve a critical problem: making personal finance management
-                smarter, more intuitive, and more effective.
+                SpendWise.AI represents the next evolution in personal finance management.
+                Built with cutting-edge technologies like OpenAI GPT-3.5-turbo, Redis caching,
+                and intelligent conversation state management, we have created an experience
+                that feels more like chatting with a financial advisor than using software.
               </p>
               <p className='text-lg text-gray-600 dark:text-gray-400 leading-relaxed'>
-                Since our launch, we&#39;ve helped thousands of users achieve
-                better budgeting and improve their overall financial health
-                through the power of artificial intelligence. Every feature is
-                designed with user experience and financial wellness in mind.
+                Our conversational AI doesn&rsquo;t just track expenses—it understands context,
+                maintains conversation history, and provides personalized insights that
+                adapt to your unique spending patterns. With lightning-fast Redis caching
+                and smart memory fallbacks, every interaction is instant and reliable.
               </p>
               <div className='flex items-center gap-4 pt-4'>
                 <div className='flex -space-x-2'>
@@ -215,25 +320,25 @@ const AboutPage = () => {
                 <div className='flex items-center gap-4'>
                   <div className='w-3 h-3 bg-emerald-500 dark:bg-emerald-400 rounded-full'></div>
                   <div className='text-gray-900 dark:text-gray-100 font-medium'>
-                    Founded in 2024
+                    Next.js 15 + React 19
                   </div>
                 </div>
                 <div className='flex items-center gap-4'>
                   <div className='w-3 h-3 bg-green-500 dark:bg-green-400 rounded-full'></div>
                   <div className='text-gray-900 dark:text-gray-100 font-medium'>
-                    AI-First Approach
+                    OpenAI GPT-3.5-turbo
                   </div>
                 </div>
                 <div className='flex items-center gap-4'>
                   <div className='w-3 h-3 bg-teal-500 dark:bg-teal-400 rounded-full'></div>
                   <div className='text-gray-900 dark:text-gray-100 font-medium'>
-                    Global Impact
+                    Redis + Memory Caching
                   </div>
                 </div>
                 <div className='flex items-center gap-4'>
                   <div className='w-3 h-3 bg-emerald-500 dark:bg-emerald-400 rounded-full'></div>
                   <div className='text-gray-900 dark:text-gray-100 font-medium'>
-                    User-Centric Design
+                    Conversational Interface
                   </div>
                 </div>
               </div>

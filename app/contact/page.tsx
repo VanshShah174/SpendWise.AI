@@ -9,7 +9,7 @@ const ContactPage = () => {
         <div className='relative z-10 max-w-4xl mx-auto w-full'>
           <div className='inline-flex items-center gap-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium mb-4 sm:mb-6 shadow-lg'>
             <span className='w-1.5 h-1.5 sm:w-2 sm:h-2 bg-emerald-500 dark:bg-emerald-400 rounded-full animate-pulse'></span>
-            Get in Touch
+            AI-Powered Support • 24/7 Available
           </div>
           <h1 className='text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 text-gray-900 dark:text-gray-100 leading-tight'>
             Contact{' '}
@@ -18,8 +18,8 @@ const ContactPage = () => {
             </span>
           </h1>
           <p className='text-base sm:text-lg md:text-xl lg:text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed px-2 sm:px-0'>
-            Have questions about AI-powered expense tracking or need help?
-            We&#39;re here to assist you with intelligent financial management.
+            Need help with our AI chatbot or conversational expense tracking?
+            Get instant support for Redis caching, natural language features, and more!
           </p>
           <div className='mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-2 sm:px-0'>
             <a
@@ -59,8 +59,8 @@ const ContactPage = () => {
               </span>
             </h2>
             <p className='text-sm sm:text-base md:text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto px-2 sm:px-0'>
-              Choose the most convenient way to reach out to our ExpenseTracker
-              AI support team.
+              Get expert help with SpendWise.AI&apos;s conversational interface,
+              Redis optimization, and intelligent expense management features.
             </p>
           </div>
 
@@ -138,6 +138,79 @@ const ContactPage = () => {
         </div>
       </section>
 
+      {/* AI Support Features Section */}
+      <section className='py-12 sm:py-16 md:py-20 px-4 sm:px-6 md:px-8 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm relative overflow-hidden'>
+        <div className='absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500'></div>
+        <div className='max-w-6xl mx-auto'>
+          <div className='text-center mb-10 sm:mb-12 md:mb-16'>
+            <div className='inline-flex items-center gap-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-3 py-1 rounded-full text-xs sm:text-sm font-medium mb-4 sm:mb-6'>
+              <span className='w-1.5 h-1.5 bg-emerald-500 dark:bg-emerald-400 rounded-full animate-pulse'></span>
+              AI Support Specialties
+            </div>
+            <h2 className='text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 text-gray-900 dark:text-gray-100 px-2 sm:px-0'>
+              Expert Help with{' '}
+              <span className='text-emerald-600 dark:text-emerald-400'>
+                AI Features
+              </span>
+            </h2>
+            <p className='text-sm sm:text-base md:text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto px-2 sm:px-0'>
+              Our support team specializes in SpendWise.AIs advanced conversational
+              and caching technologies.
+            </p>
+          </div>
+
+          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8'>
+            <div className='group relative bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-100/50 dark:border-gray-700/50 hover:shadow-xl transition-all duration-200'>
+              <div className='absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-green-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-200'></div>
+              <div className='relative z-10'>
+                <div className='w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg mb-4'>
+                  <span className='text-white text-lg'>💬</span>
+                </div>
+                <h3 className='text-lg font-bold text-gray-900 dark:text-gray-100 mb-3'>
+                  Chatbot Training
+                </h3>
+                <p className='text-sm text-gray-600 dark:text-gray-400 leading-relaxed'>
+                  Learn how to chat naturally with our AI: &quot;I spent $25 on groceries&quot;
+                  and master conversation flows for expense management.
+                </p>
+              </div>
+            </div>
+
+            <div className='group relative bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-100/50 dark:border-gray-700/50 hover:shadow-xl transition-all duration-200'>
+              <div className='absolute inset-0 bg-gradient-to-br from-green-500/5 to-teal-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-200'></div>
+              <div className='relative z-10'>
+                <div className='w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center shadow-lg mb-4'>
+                  <span className='text-white text-lg'>⚡</span>
+                </div>
+                <h3 className='text-lg font-bold text-gray-900 dark:text-gray-100 mb-3'>
+                  Performance Issues
+                </h3>
+                <p className='text-sm text-gray-600 dark:text-gray-400 leading-relaxed'>
+                  Redis caching problems? Slow responses? We&rsquo;ll optimize your
+                  SpendWise.AI experience for lightning-fast performance.
+                </p>
+              </div>
+            </div>
+
+            <div className='group relative bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-100/50 dark:border-gray-700/50 hover:shadow-xl transition-all duration-200 sm:col-span-2 lg:col-span-1'>
+              <div className='absolute inset-0 bg-gradient-to-br from-teal-500/5 to-emerald-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-200'></div>
+              <div className='relative z-10'>
+                <div className='w-10 h-10 bg-teal-500 rounded-xl flex items-center justify-center shadow-lg mb-4'>
+                  <span className='text-white text-lg'>🧠</span>
+                </div>
+                <h3 className='text-lg font-bold text-gray-900 dark:text-gray-100 mb-3'>
+                  Context & Memory
+                </h3>
+                <p className='text-sm text-gray-600 dark:text-gray-400 leading-relaxed'>
+                  Issues with conversation history or context awareness?
+                  We&rsquo;ll help you master multi-turn AI conversations.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Support Hours & FAQ Section */}
       <section className='py-12 sm:py-16 md:py-20 px-4 sm:px-6 md:px-8 bg-gradient-to-br from-gray-50 via-white to-emerald-50 dark:from-gray-900 dark:via-gray-800 dark:to-emerald-900/20'>
         <div className='max-w-4xl mx-auto'>
@@ -198,28 +271,26 @@ const ContactPage = () => {
               <div className='space-y-3'>
                 <div className='p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg'>
                   <h4 className='font-semibold text-gray-900 dark:text-gray-100 text-xs sm:text-sm mb-1'>
-                    Technical Issues
+                    Chatbot Not Responding
                   </h4>
                   <p className='text-xs text-gray-600 dark:text-gray-400'>
-                    App not working properly? Check our troubleshooting guide
-                    first.
+                    AI assistant issues? Check Redis connection and conversation state.
                   </p>
                 </div>
                 <div className='p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg'>
                   <h4 className='font-semibold text-gray-900 dark:text-gray-100 text-xs sm:text-sm mb-1'>
-                    AI Features
+                    Natural Language Tips
                   </h4>
                   <p className='text-xs text-gray-600 dark:text-gray-400'>
-                    Questions about AI insights? Our AI documentation has
-                    answers.
+                    Learn the best ways to chat with our AI for expense tracking.
                   </p>
                 </div>
                 <div className='p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg'>
                   <h4 className='font-semibold text-gray-900 dark:text-gray-100 text-xs sm:text-sm mb-1'>
-                    Account & Billing
+                    Performance Optimization
                   </h4>
                   <p className='text-xs text-gray-600 dark:text-gray-400'>
-                    Account issues or billing questions? Contact us directly.
+                    Slow responses? We&rsquo;ll help optimize your Redis caching setup.
                   </p>
                 </div>
               </div>
