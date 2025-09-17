@@ -3,12 +3,19 @@
 import { checkUser } from '@/lib/checkUser';
 import { db } from '@/lib/db';
 import { generateExpenseInsights, AIInsight, ExpenseRecord } from '@/lib/ai';
+import { getCachedSpendingInsights, cacheSpendingInsights } from '@/lib/cache/cache';
 
 export async function getAIInsights(): Promise<AIInsight[]> {
   try {
     const user = await checkUser();
     if (!user) {
       throw new Error('User not authenticated');
+    }
+
+    // Check cache first
+    const cachedInsights = await getCachedSpendingInsights(user.clerkUserId);
+    if (cachedInsights) {
+      return cachedInsights;
     }
 
     // Get user's recent expenses (last 30 days)
@@ -30,10 +37,10 @@ export async function getAIInsights(): Promise<AIInsight[]> {
 
     if (expenses.length === 0) {
       // Return default insights for new users
-      return [
+      const defaultInsights = [
         {
           id: 'welcome-1',
-          type: 'info',
+          type: 'info' as const,
           title: 'Welcome to SpendWise.AI!',
           message:
             'Start adding your expenses to get personalized AI insights about your spending patterns.',
@@ -42,7 +49,7 @@ export async function getAIInsights(): Promise<AIInsight[]> {
         },
         {
           id: 'welcome-2',
-          type: 'tip',
+          type: 'tip' as const,
           title: 'Track Regularly',
           message:
             'For best results, try to log expenses daily. This helps our AI provide more accurate insights.',
@@ -50,6 +57,8 @@ export async function getAIInsights(): Promise<AIInsight[]> {
           confidence: 1.0,
         },
       ];
+      await cacheSpendingInsights(user.clerkUserId, defaultInsights);
+      return defaultInsights;
     }
 
     // Convert to format expected by AI
@@ -63,6 +72,10 @@ export async function getAIInsights(): Promise<AIInsight[]> {
 
     // Generate AI insights
     const insights = await generateExpenseInsights(expenseData);
+    
+    // Cache the insights
+    await cacheSpendingInsights(user.clerkUserId, insights);
+    
     return insights;
   } catch (error) {
     console.error('Error getting AI insights:', error);

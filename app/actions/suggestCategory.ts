@@ -1,6 +1,7 @@
 'use server';
 
 import { categorizeExpense } from '@/lib/ai';
+import { getCachedCategorySuggestion, cacheCategorySuggestion } from '@/lib/cache/cache';
 
 export async function suggestCategory(
   description: string
@@ -13,7 +14,19 @@ export async function suggestCategory(
       };
     }
 
-    const category = await categorizeExpense(description.trim());
+    const trimmedDescription = description.trim();
+    
+    // Check cache first
+    const cachedCategory = await getCachedCategorySuggestion(trimmedDescription);
+    if (cachedCategory) {
+      return { category: cachedCategory };
+    }
+
+    const category = await categorizeExpense(trimmedDescription);
+    
+    // Cache the result
+    await cacheCategorySuggestion(trimmedDescription, category);
+    
     return { category };
   } catch (error) {
     console.error('❌ Error in suggestCategory server action:', error);

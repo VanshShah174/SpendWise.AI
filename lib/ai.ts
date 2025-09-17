@@ -181,6 +181,16 @@ export async function generateAIAnswer(
   context: ExpenseRecord[]
 ): Promise<string> {
   try {
+    // Check if user is asking to add/create expense
+    const addExpenseKeywords = ['add expense', 'create expense', 'new expense', 'record expense', 'log expense', 'enter expense'];
+    const isAddingExpense = addExpenseKeywords.some(keyword => 
+      question.toLowerCase().includes(keyword)
+    );
+
+    if (isAddingExpense) {
+      return "I can't directly add expenses for you, but you can easily add a new expense using the 'Add New Record' form on your dashboard. Just enter the amount, description, and I'll help categorize it automatically! 💰";
+    }
+
     const expensesSummary = context.map((expense) => ({
       amount: expense.amount,
       category: expense.category,
@@ -193,11 +203,18 @@ export async function generateAIAnswer(
     Expense Data:
     ${JSON.stringify(expensesSummary, null, 2)}
 
-    Provide a comprehensive answer that:
+    IMPORTANT: Only analyze/discuss the expense data if the question is asking for analysis, insights, or information about existing expenses.
+    
+    If the user is asking to:
+    - Add/create/record new expenses: Direct them to use the Add New Record form
+    - Delete/modify expenses: Direct them to the expense list
+    - General financial advice: Provide helpful tips
+    
+    Provide a response that:
     1. Addresses the specific question directly
-    2. Uses concrete data from the expenses when possible
+    2. Uses concrete data from expenses only when relevant
     3. Offers actionable advice
-    4. Keeps the response concise but informative (2-3 sentences)
+    4. Keeps response concise (2-3 sentences)
     
     Return only the answer text, no additional formatting.`;
 
