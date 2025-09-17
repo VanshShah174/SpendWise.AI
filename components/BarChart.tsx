@@ -12,6 +12,7 @@ import {
 } from 'chart.js';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useState, useEffect } from 'react';
+import { useExpenseRefresh } from '@/lib/hooks/useExpenseRefresh';
 
 // Register Chart.js components
 ChartJS.register(
@@ -28,12 +29,14 @@ interface Record {
   date: string; // ISO date string
   amount: number; // Amount spent
   category: string; // Expense category
+  text: string; // Expense description
 }
 
 const BarChart = ({ records }: { records: Record[] }) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const [windowWidth, setWindowWidth] = useState(1024); // Default to desktop width
+  const { lastUpdate } = useExpenseRefresh();
 
   useEffect(() => {
     // Set initial window width
@@ -54,7 +57,7 @@ const BarChart = ({ records }: { records: Record[] }) => {
   const aggregateByDate = (records: Record[]) => {
     const dateMap = new Map<
       string,
-      { total: number; categories: string[]; originalDate: string }
+      { total: number; categories: string[]; expenses: string[]; originalDate: string }
     >();
 
     records.forEach((record) => {
@@ -72,10 +75,12 @@ const BarChart = ({ records }: { records: Record[] }) => {
         if (!existing.categories.includes(record.category)) {
           existing.categories.push(record.category);
         }
+        existing.expenses.push(`${record.text} ($${record.amount.toFixed(2)})`);
       } else {
         dateMap.set(dateKey, {
           total: record.amount,
           categories: [record.category],
+          expenses: [`${record.text} ($${record.amount.toFixed(2)})`],
           originalDate: record.date, // Keep original ISO date for sorting
         });
       }
@@ -87,6 +92,7 @@ const BarChart = ({ records }: { records: Record[] }) => {
         date,
         amount: data.total,
         categories: data.categories,
+        expenses: data.expenses,
         originalDate: data.originalDate,
       }))
       .sort(
@@ -170,7 +176,18 @@ const BarChart = ({ records }: { records: Record[] }) => {
               item.categories.length > 1
                 ? `Categories: ${item.categories.join(', ')}`
                 : `Category: ${item.categories[0]}`;
-            return [`Total: $${item.amount.toFixed(2)}`, categoriesText];
+            
+            const result = [`Total: $${item.amount.toFixed(2)}`, categoriesText];
+            
+            // Add expense descriptions
+            if (item.expenses.length > 0) {
+              result.push('Expenses:');
+              item.expenses.forEach(expense => {
+                result.push(`• ${expense}`);
+              });
+            }
+            
+            return result;
           },
         },
       },

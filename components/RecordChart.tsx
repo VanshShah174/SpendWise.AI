@@ -1,8 +1,21 @@
-import getRecords from '@/app/actions/getRecords';
-import BarChart from './BarChart'; // Ensure BarChart.tsx or BarChart.jsx exists in the same directory
+'use client';
 
-const RecordChart = async () => {
-  const { records, error } = await getRecords();
+import BarChart from './BarChart';
+import { useExpenseRecords } from '@/lib/hooks/useExpenseData';
+
+const RecordChart = () => {
+  const { data: records = [], error, isLoading: loading } = useExpenseRecords();
+
+  if (loading) {
+    return (
+      <div className='bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 sm:p-6 rounded-2xl shadow-xl border border-gray-100/50 dark:border-gray-700/50'>
+        <div className='animate-pulse space-y-4'>
+          <div className='h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/3'></div>
+          <div className='h-64 bg-gray-200 dark:bg-gray-700 rounded'></div>
+        </div>
+      </div>
+    );
+  }
 
   if (error) {
     return (
