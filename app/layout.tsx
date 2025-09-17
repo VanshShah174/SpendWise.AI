@@ -5,6 +5,8 @@ import ClerkThemeProvider from '@/components/ClerkThemeProvider';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import { ExpenseProvider } from '@/contexts/ExpenseContext';
+import { QueryProvider } from '@/components/QueryProvider';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -48,13 +50,17 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-300`}
       >
-        <ThemeProvider>
-          <ClerkThemeProvider>
-            <Navbar />
-            {children}
-            <Footer />
-          </ClerkThemeProvider>
-        </ThemeProvider>
+        <QueryProvider>
+          <ThemeProvider>
+            <ExpenseProvider>
+              <ClerkThemeProvider>
+                <Navbar />
+                {children}
+                <Footer />
+              </ClerkThemeProvider>
+            </ExpenseProvider>
+          </ThemeProvider>
+        </QueryProvider>
       </body>
     </html>
   );
