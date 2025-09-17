@@ -4,6 +4,7 @@ import ExpenseStats from '@/components/ExpenseStats';
 import Guest from '@/components/Guest';
 import RecordChart from '@/components/RecordChart';
 import RecordHistory from '@/components/RecordHistory';
+import ChatbotWrapper from '@/components/ChatbotWrapper';
 import { currentUser } from '@clerk/nextjs/server';
 
 export default async function HomePage() {
@@ -99,6 +100,9 @@ export default async function HomePage() {
           <RecordHistory />
         </div>
       </div>
+      
+      {/* Chatbot Integration */}
+      <ChatbotWrapper />
     </main>
   );
 }

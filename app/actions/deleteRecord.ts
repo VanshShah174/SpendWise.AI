@@ -14,19 +14,31 @@ async function deleteRecord(recordId: string): Promise<{
   }
 
   try {
-    await db.record.delete({
+    // First check if record exists and belongs to user
+    const existingRecord = await db.record.findFirst({
       where: {
         id: recordId,
         userId,
       },
     });
 
+    if (!existingRecord) {
+      return { error: 'Record not found or access denied' };
+    }
+
+    // Delete the record
+    await db.record.delete({
+      where: {
+        id: recordId,
+      },
+    });
+
     revalidatePath('/');
 
-    return { message: 'Record deleted' };
+    return { message: 'Record deleted successfully' };
   } catch (error) {
-    console.error('Error deleting record:', error); // Log the error
-    return { error: 'Database error' };
+    console.error('Error deleting record:', error);
+    return { error: 'Failed to delete record' };
   }
 }
 
