@@ -2,6 +2,7 @@
 import { useRef, useState } from 'react';
 import addExpenseRecord from '@/app/actions/addExpenseRecord';
 import { suggestCategory } from '@/app/actions/suggestCategory';
+import { useExpenseContext } from '@/contexts/ExpenseContext';
 
 const AddRecord = () => {
   const formRef = useRef<HTMLFormElement>(null);
@@ -12,6 +13,7 @@ const AddRecord = () => {
   const [category, setCategory] = useState(''); // State for selected expense category
   const [description, setDescription] = useState(''); // State for expense description
   const [isCategorizingAI, setIsCategorizingAI] = useState(false); // State for AI categorization loading
+  const { triggerRefresh } = useExpenseContext();
 
   const clientAction = async (formData: FormData) => {
     setIsLoading(true); // Show spinner
@@ -32,6 +34,9 @@ const AddRecord = () => {
       setAmount(50); // Reset the amount to the default value
       setCategory(''); // Reset the category
       setDescription(''); // Reset the description
+      
+      // Trigger refresh for live updates
+      triggerRefresh();
     }
 
     setIsLoading(false); // Hide spinner
