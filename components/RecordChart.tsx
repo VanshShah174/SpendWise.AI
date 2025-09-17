@@ -42,7 +42,7 @@ const RecordChart = () => {
               Error loading chart data
             </p>
           </div>
-          <p className='text-red-700 dark:text-red-400 text-xs ml-8'>{error}</p>
+          <p className='text-red-700 dark:text-red-400 text-xs ml-8'>{String(error)}</p>
         </div>
       </div>
     );

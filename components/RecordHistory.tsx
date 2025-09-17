@@ -48,7 +48,7 @@ const RecordHistory = () => {
             </h4>
           </div>
           <p className='text-red-700 dark:text-red-400 ml-8 sm:ml-10 text-xs'>
-            {error}
+            {String(error)}
           </p>
         </div>
       </div>
