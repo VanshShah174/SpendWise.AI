@@ -4,9 +4,11 @@ import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
 import ThemeToggle from './ThemeToggle';
 import { useState } from 'react';
+import { useChatbot } from '@/contexts/ChatbotContext';
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { openChatbot, setInputMessage } = useChatbot();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -29,13 +31,17 @@ export default function Navbar() {
             >
               <div className='w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-gradient-to-br from-emerald-500 via-green-500 to-teal-500 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:rotate-3'>
                 <span className='text-white text-xs sm:text-sm md:text-lg font-bold'>
-                  💰
+                  🤖
                 </span>
               </div>
-              <span className='text-sm sm:text-base md:text-lg lg:text-xl font-bold bg-gradient-to-r from-emerald-600 via-green-500 to-teal-500 bg-clip-text text-transparent'>
-                <span className='hidden sm:inline'>SpendWise.AI</span>
-                <span className='sm:hidden'>SpendWise.AI</span>
-              </span>
+              <div className='flex flex-col'>
+                <span className='text-sm sm:text-base md:text-lg lg:text-xl font-bold bg-gradient-to-r from-emerald-600 via-green-500 to-teal-500 bg-clip-text text-transparent'>
+                  SpendWise.AI
+                </span>
+                <span className='hidden lg:block text-xs text-emerald-600/70 dark:text-emerald-400/70 font-medium -mt-1'>
+                  Smart Expense Tracker
+                </span>
+              </div>
             </Link>
           </div>
 
@@ -64,6 +70,51 @@ export default function Navbar() {
               <span className='relative z-10'>Contact</span>
               <div className='absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-green-500/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200'></div>
             </Link>
+            
+            {/* AI Chatbot Quick Access */}
+            <div className='relative group'>
+              <button 
+                onClick={() => openChatbot()}
+                className='flex items-center gap-2 bg-gradient-to-r from-emerald-500/10 to-green-500/10 dark:from-emerald-900/30 dark:to-green-900/30 text-emerald-700 dark:text-emerald-300 px-3 lg:px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 hover:from-emerald-500/20 hover:to-green-500/20 dark:hover:from-emerald-900/40 dark:hover:to-green-900/40 border border-emerald-200/50 dark:border-emerald-700/50'
+              >
+                <span className='text-xs'>🤖</span>
+                <span className='relative z-10'>AI Chat</span>
+              </button>
+              <div className='absolute top-full left-0 mt-2 w-48 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50'>
+                <div className='p-3'>
+                  <div className='text-xs text-gray-600 dark:text-gray-400 mb-2'>Try these commands:</div>
+                  <div className='space-y-1 text-xs'>
+                    <button 
+                      onClick={() => {
+                        setInputMessage('I spent $15 on coffee');
+                        openChatbot();
+                      }}
+                      className='block w-full text-left text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 p-1 rounded'
+                    >
+                      &quot;I spent $15 on coffee&quot;
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setInputMessage('Show my expenses');
+                        openChatbot();
+                      }}
+                      className='block w-full text-left text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 p-1 rounded'
+                    >
+                      &quot;Show my expenses&quot;
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setInputMessage('Analyze my spending');
+                        openChatbot();
+                      }}
+                      className='block w-full text-left text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-900/20 p-1 rounded'
+                    >
+                      &quot;Analyze my spending&quot;
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Right Section */}
@@ -182,6 +233,25 @@ export default function Navbar() {
               <span className='text-base'>📞</span>
               <span>Contact</span>
             </Link>
+            
+            {/* Mobile AI Chat Info */}
+            <div className='px-3 py-2.5 rounded-lg bg-gradient-to-r from-emerald-50/50 to-green-50/50 dark:from-emerald-900/20 dark:to-green-900/20 border border-emerald-200/30 dark:border-emerald-700/30'>
+              <button 
+                onClick={() => {
+                  openChatbot();
+                  closeMobileMenu();
+                }}
+                className='w-full text-left'
+              >
+                <div className='flex items-center gap-3 mb-2'>
+                  <span className='text-base'>🤖</span>
+                  <span className='text-sm font-medium text-emerald-700 dark:text-emerald-300'>Open AI Chatbot</span>
+                </div>
+                <div className='text-xs text-gray-600 dark:text-gray-400 ml-6'>
+                  Try: &quot;I spent $20 on lunch&quot; or &quot;Show my expenses&quot;
+                </div>
+              </button>
+            </div>
 
             {/* Mobile Authentication */}
             <div className='pt-3 border-t border-gray-200/50 dark:border-gray-600/50'>

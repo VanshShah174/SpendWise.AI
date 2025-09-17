@@ -32,7 +32,13 @@ const RecordItem = ({ record }: { record: Record }) => {
     text: record.text,
     amount: record.amount,
     category: record.category,
-    date: new Date(record.date).toISOString().split('T')[0],
+    date: (() => {
+      const date = new Date(record.date);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    })(),
   });
   const { triggerRefresh } = useExpenseContext();
 
@@ -56,7 +62,14 @@ const RecordItem = ({ record }: { record: Record }) => {
   const handleUpdateRecord = async () => {
     setIsLoading(true);
     try {
-      const result = await updateRecord(record.id, editData);
+      // Create date object using local timezone to preserve the exact date
+      const [year, month, day] = editData.date.split('-').map(Number);
+      const dateObj = new Date(year, month - 1, day);
+      const updateData = {
+        ...editData,
+        date: dateObj.toISOString()
+      };
+      const result = await updateRecord(record.id, updateData);
       if (result.message) {
         setIsEditing(false);
         triggerRefresh();
@@ -75,7 +88,13 @@ const RecordItem = ({ record }: { record: Record }) => {
       text: record.text,
       amount: record.amount,
       category: record.category,
-      date: new Date(record.date).toISOString().split('T')[0],
+      date: (() => {
+        const date = new Date(record.date);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      })(),
     });
     setIsEditing(false);
   };
@@ -175,7 +194,11 @@ const RecordItem = ({ record }: { record: Record }) => {
               <div className='space-y-3'>
                 <div className='flex items-center justify-between'>
                   <span className='text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide'>
-                    {new Date(record?.date).toLocaleDateString()}
+                    {new Date(record?.date).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric'
+                    })}
                   </span>
                   <span className='text-lg sm:text-xl font-extrabold text-gray-900 dark:text-gray-100'>
                     ${record?.amount.toFixed(2)}

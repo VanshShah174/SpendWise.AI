@@ -63,10 +63,10 @@ const BarChart = ({ records }: { records: Record[] }) => {
     records.forEach((record) => {
       // Parse the date string properly and extract just the date part (YYYY-MM-DD)
       const dateObj = new Date(record.date);
-      // Use UTC methods to avoid timezone issues
-      const year = dateObj.getUTCFullYear();
-      const month = String(dateObj.getUTCMonth() + 1).padStart(2, '0');
-      const day = String(dateObj.getUTCDate()).padStart(2, '0');
+      // Use local date methods for consistency with other components
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const day = String(dateObj.getDate()).padStart(2, '0');
       const dateKey = `${year}-${month}-${day}`;
       const existing = dateMap.get(dateKey);
 
