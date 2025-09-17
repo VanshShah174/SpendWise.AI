@@ -6,7 +6,7 @@ let connectionAttempted = false;
 let useMemoryFallback = false;
 
 function buildRedisClient(): Redis {
-  const opts: any = {
+  const opts: Record<string, unknown> = {
     host: process.env.REDIS_HOST,
     port: parseInt(process.env.REDIS_PORT || "6379", 10),
     username: process.env.REDIS_USERNAME || "default",
@@ -45,8 +45,8 @@ export function getRedisClient(): Redis | null {
     redis.on("error", (err) => console.warn("Redis error:", err?.message || err));
     redis.on("end", () => console.warn("🔌 Redis connection closed"));
     return redis;
-  } catch (error: any) {
-    console.warn("Redis init failed:", error?.message || error);
+  } catch (error: unknown) {
+    console.warn("Redis init failed:", error instanceof Error ? error.message : error);
     redis = null;
     return null;
   }
@@ -62,7 +62,7 @@ async function isRedisConnected(client: Redis): Promise<boolean> {
   }
 }
 
-export async function cacheConversation(key: string, messages: any[], ttl = 86400) {
+export async function cacheConversation(key: string, messages: Record<string, unknown>[], ttl = 86400) {
   const client = getRedisClient();
   if (!client || useMemoryFallback || !(await isRedisConnected(client))) {
     setMemoryCache(key, messages, ttl);
@@ -71,15 +71,15 @@ export async function cacheConversation(key: string, messages: any[], ttl = 8640
   try {
     await client.setex(key, ttl, JSON.stringify(messages));
     return true;
-  } catch (error: any) {
-    console.warn("Redis cache failed, using memory:", error?.message || error);
+  } catch (error: unknown) {
+    console.warn("Redis cache failed, using memory:", error instanceof Error ? error.message : error);
     useMemoryFallback = true;
     setMemoryCache(key, messages, ttl);
     return true;
   }
 }
 
-export async function getConversation(key: string): Promise<any[] | null> {
+export async function getConversation(key: string): Promise<Record<string, unknown>[] | null> {
   const client = getRedisClient();
   if (!client || useMemoryFallback || !(await isRedisConnected(client))) {
     return getMemoryCache(key);
@@ -87,8 +87,8 @@ export async function getConversation(key: string): Promise<any[] | null> {
   try {
     const data = await client.get(key);
     return data ? JSON.parse(data) : null;
-  } catch (error: any) {
-    console.warn("Redis read failed, using memory:", error?.message || error);
+  } catch (error: unknown) {
+    console.warn("Redis read failed, using memory:", error instanceof Error ? error.message : error);
     useMemoryFallback = true;
     return getMemoryCache(key);
   }

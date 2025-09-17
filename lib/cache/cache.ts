@@ -17,7 +17,7 @@ const CACHE_TTL = {
   CATEGORY: 7200, // 2 hours for category suggestions
 } as const;
 
-async function isRedisReady(client: any): Promise<boolean> {
+async function isRedisReady(client: unknown): Promise<boolean> {
   try {
     if (!client || client.status !== 'ready') return false;
     await client.ping();
@@ -27,7 +27,7 @@ async function isRedisReady(client: any): Promise<boolean> {
   }
 }
 
-export async function cacheSet(key: string, data: any, ttl: number = 3600): Promise<boolean> {
+export async function cacheSet(key: string, data: unknown, ttl: number = 3600): Promise<boolean> {
   const client = getRedisClient();
   
   if (!client || !(await isRedisReady(client))) {
@@ -45,7 +45,7 @@ export async function cacheSet(key: string, data: any, ttl: number = 3600): Prom
   }
 }
 
-export async function cacheGet(key: string): Promise<any | null> {
+export async function cacheGet(key: string): Promise<unknown> {
   const client = getRedisClient();
   
   if (!client || !(await isRedisReady(client))) {
@@ -72,22 +72,22 @@ export async function getCachedFAQ(question: string): Promise<string | null> {
   return cached?.answer || null;
 }
 
-export async function cacheSpendingInsights(userId: string, insights: any[]): Promise<void> {
+export async function cacheSpendingInsights(userId: string, insights: unknown[]): Promise<void> {
   const key = `${CACHE_KEYS.SPENDING_INSIGHTS}${userId}`;
   await cacheSet(key, insights, CACHE_TTL.INSIGHTS);
 }
 
-export async function getCachedSpendingInsights(userId: string): Promise<any[] | null> {
+export async function getCachedSpendingInsights(userId: string): Promise<unknown[] | null> {
   const key = `${CACHE_KEYS.SPENDING_INSIGHTS}${userId}`;
   return await cacheGet(key);
 }
 
-export async function cacheUserSpending(userId: string, spendingData: any): Promise<void> {
+export async function cacheUserSpending(userId: string, spendingData: unknown): Promise<void> {
   const key = `${CACHE_KEYS.USER_SPENDING}${userId}`;
   await cacheSet(key, spendingData, CACHE_TTL.SPENDING);
 }
 
-export async function getCachedUserSpending(userId: string): Promise<any | null> {
+export async function getCachedUserSpending(userId: string): Promise<unknown> {
   const key = `${CACHE_KEYS.USER_SPENDING}${userId}`;
   return await cacheGet(key);
 }

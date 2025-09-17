@@ -1,13 +1,12 @@
 import { ExpenseConversationState, getConversationState, setConversationState, clearConversationState, parseAmount, parseDate, parseCategory } from './conversation-state';
 import { categorizeExpense } from '../ai';
 import addExpenseRecordAction from '@/app/actions/addExpenseRecord';
-import { db } from '@/lib/db';
 
 export async function handleExpenseConversation(
   userId: string, 
   conversationId: string, 
   message: string
-): Promise<{ response: string; completed?: boolean; expenseAdded?: any }> {
+): Promise<{ response: string; completed?: boolean; expenseAdded?: Record<string, unknown> }> {
   
   const state = await getConversationState(userId, conversationId);
   
@@ -113,8 +112,8 @@ async function handleAmountStep(userId: string, conversationId: string, state: E
   let suggestedCategory = 'Other';
   try {
     suggestedCategory = await categorizeExpense(state.data.description || '');
-  } catch (error) {
-    console.error('Category suggestion failed:', error);
+  } catch {
+    // Category suggestion failed, use default
   }
 
   return {
@@ -129,7 +128,7 @@ async function handleCategoryStep(userId: string, conversationId: string, state:
     // User said yes, use AI suggestion
     try {
       category = await categorizeExpense(state.data.description || '');
-    } catch (error) {
+    } catch {
       category = 'Other';
     }
   }
@@ -188,7 +187,7 @@ async function handleConfirmationStep(userId: string, conversationId: string, st
           completed: true
         };
       }
-    } catch (error) {
+    } catch {
       await clearConversationState(userId, conversationId);
       return {
         response: "❌ Something went wrong while saving your expense. Please try again or add it manually from the dashboard.",

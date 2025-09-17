@@ -17,7 +17,7 @@ export async function handleEditConversation(
   }
 
   try {
-    let updatedData: any = {};
+    const updatedData: Record<string, unknown> = {};
     
     switch (field) {
       case 'description':
@@ -83,7 +83,7 @@ export async function handleEditConversation(
 export async function startEditConversation(
   userId: string,
   conversationId: string,
-  expense: any
+  expense: { id: string; text: string; amount: number; category: string; date: Date }
 ): Promise<void> {
   const editState: EditConversationState = {
     expenseId: expense.id,

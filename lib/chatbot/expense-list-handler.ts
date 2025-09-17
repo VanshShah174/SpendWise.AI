@@ -1,6 +1,6 @@
 import getRecords from '@/app/actions/getRecords';
 
-export async function handleModifyExpenses(userId: string): Promise<string> {
+export async function handleModifyExpenses(): Promise<string> {
   try {
     const { records, error } = await getRecords();
     
@@ -38,7 +38,7 @@ export async function handleModifyExpenses(userId: string): Promise<string> {
   }
 }
 
-export async function handleShowExpenses(userId: string): Promise<string> {
+export async function handleShowExpenses(): Promise<string> {
   try {
     const { records, error } = await getRecords();
     
@@ -74,7 +74,7 @@ export async function handleShowExpenses(userId: string): Promise<string> {
   }
 }
 
-export async function handleEditExpense(userId: string, expenseNumber: number): Promise<{ response: string; expense?: any }> {
+export async function handleEditExpense(_userId: string, expenseNumber: number): Promise<{ response: string; expense?: Record<string, unknown> }> {
   try {
     const { records, error } = await getRecords();
     
@@ -98,7 +98,7 @@ export async function handleEditExpense(userId: string, expenseNumber: number): 
   }
 }
 
-export async function handleDeleteExpense(userId: string, expenseNumber: number): Promise<{ response: string; deleted?: boolean }> {
+export async function handleDeleteExpense(_userId: string, expenseNumber: number): Promise<{ response: string; deleted?: boolean }> {
   try {
     const { records, error } = await getRecords();
     

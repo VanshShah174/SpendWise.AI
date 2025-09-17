@@ -32,7 +32,7 @@ export default async function updateRecord(recordId: string, data: UpdateRecordD
     }
 
     // Validate and prepare update data
-    const updateData: any = {};
+    const updateData: Record<string, unknown> = {};
     
     if (data.text !== undefined && data.text !== null) {
       updateData.text = data.text;
