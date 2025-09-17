@@ -353,7 +353,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onToggle }) => {
                 </div>
                 <h4 className="font-bold text-xl text-gray-900 dark:text-gray-100 mb-3">Welcome to SpendWise AI! 🚀</h4>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
-                  I'm your intelligent expense assistant powered by AI and Redis caching. I can analyze your spending patterns, provide personalized insights, and answer questions about your finances instantly!
+                  I&apos;m your intelligent expense assistant powered by AI and Redis caching. I can analyze your spending patterns, provide personalized insights, and answer questions about your finances instantly!
                 </p>
                 <div className="space-y-3">
                   <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">

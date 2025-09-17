@@ -33,11 +33,6 @@ export async function getSmartFAQAnswer(question: string): Promise<string> {
 async function generateGeneralFinancialAnswer(question: string): Promise<string> {
   try {
     // Use AI to generate answer for general financial questions without user data
-    const prompt = `Answer this financial question concisely and helpfully: "${question}"
-    
-    Provide practical, actionable advice that applies to most people. Keep the response to 2-3 sentences.
-    Focus on general best practices and widely applicable tips.`;
-
     const answer = await generateAIAnswer(question, []);
     return answer;
   } catch (error) {

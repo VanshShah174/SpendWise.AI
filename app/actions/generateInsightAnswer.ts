@@ -2,7 +2,7 @@
 
 import { checkUser } from '@/lib/checkUser';
 import { db } from '@/lib/db';
-import { generateAIAnswer, ExpenseRecord } from '@/lib/ai';
+import { generateAIAnswer } from '@/lib/ai';
 import { getQuickFAQAnswer, getCachedFAQ, cacheFAQ, getCachedUserSpending, cacheUserSpending } from '@/lib/cache/cache';
 import { detectUserIntent } from '@/lib/chatbot/intent-detector';
 

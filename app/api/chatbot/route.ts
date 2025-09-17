@@ -21,7 +21,7 @@ interface ChatMessage {
 
 interface ExpenseQuery {
   type: 'greeting' | 'help' | 'spending' | 'category' | 'date' | 'amount' | 'trend' | 'budget' | 'analysis' | 'general';
-  parameters: Record<string, any>;
+  parameters: Record<string, unknown>;
 }
 
 export async function POST(request: NextRequest) {
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     // Check intent first for new conversations
     const intent = detectUserIntent(message);
     let response: string;
-    let expenseAdded: any = null;
+    let expenseAdded: Record<string, unknown> | null = null;
     
     // Check if user is in an expense or edit conversation
     const expenseState = await getConversationState(user.id, conversationId || 'default');
@@ -185,8 +185,8 @@ function parseExpenseQuery(message: string): ExpenseQuery {
   };
 }
 
-function extractSpendingParameters(message: string): Record<string, any> {
-  const params: Record<string, any> = {};
+function extractSpendingParameters(message: string): Record<string, unknown> {
+  const params: Record<string, unknown> = {};
   
   // Extract time period
   if (message.includes('today')) params.timeframe = 'today';
@@ -207,8 +207,8 @@ function extractSpendingParameters(message: string): Record<string, any> {
   return params;
 }
 
-function extractCategoryParameters(message: string): Record<string, any> {
-  const params: Record<string, any> = {};
+function extractCategoryParameters(message: string): Record<string, unknown> {
+  const params: Record<string, unknown> = {};
   
   const categories = ['food', 'transportation', 'shopping', 'entertainment', 'bills', 'healthcare', 'other'];
   for (const category of categories) {
@@ -221,47 +221,7 @@ function extractCategoryParameters(message: string): Record<string, any> {
   return params;
 }
 
-function extractDateParameters(message: string): Record<string, any> {
-  const params: Record<string, any> = {};
-  
-  if (message.includes('today')) params.timeframe = 'today';
-  else if (message.includes('yesterday')) params.timeframe = 'yesterday';
-  else if (message.includes('this week')) params.timeframe = 'week';
-  else if (message.includes('this month')) params.timeframe = 'month';
-  else if (message.includes('last month')) params.timeframe = 'last_month';
-  
-  return params;
-}
 
-function extractAmountParameters(message: string): Record<string, any> {
-  const params: Record<string, any> = {};
-  
-  if (message.includes('total')) params.queryType = 'total';
-  else if (message.includes('average')) params.queryType = 'average';
-  else if (message.includes('highest')) params.queryType = 'highest';
-  else if (message.includes('lowest')) params.queryType = 'lowest';
-  
-  return params;
-}
-
-function extractTrendParameters(message: string): Record<string, any> {
-  const params: Record<string, any> = {};
-  
-  if (message.includes('increasing')) params.trend = 'increasing';
-  else if (message.includes('decreasing')) params.trend = 'decreasing';
-  else if (message.includes('compare')) params.trend = 'compare';
-  
-  return params;
-}
-
-function extractBudgetParameters(message: string): Record<string, any> {
-  const params: Record<string, any> = {};
-  
-  if (message.includes('over budget')) params.status = 'over';
-  else if (message.includes('under budget')) params.status = 'under';
-  
-  return params;
-}
 
 async function generateExpenseResponse(userId: string, query: ExpenseQuery): Promise<string> {
   try {
@@ -273,7 +233,7 @@ async function generateExpenseResponse(userId: string, query: ExpenseQuery): Pro
     });
 
     const totalSpending = recentExpenses.reduce((sum, expense) => sum + expense.amount, 0);
-    const categoryTotals = recentExpenses.reduce((acc, expense) => {
+    const categoryTotals = recentExpenses.reduce((acc: Record<string, number>, expense) => {
       acc[expense.category] = (acc[expense.category] || 0) + expense.amount;
       return acc;
     }, {} as Record<string, number>);
@@ -343,11 +303,11 @@ async function generateBasicResponse(userId: string, query: ExpenseQuery): Promi
   }
 }
 
-async function handleSpendingQuery(userId: string, params: Record<string, any>): Promise<string> {
+async function handleSpendingQuery(userId: string, params: Record<string, unknown>): Promise<string> {
   const timeframe = params.timeframe || 'month';
   const category = params.category;
   
-  let whereClause: any = {
+  let whereClause: Record<string, unknown> = {
     userId: userId,
   };
   
@@ -421,7 +381,7 @@ async function handleSpendingQuery(userId: string, params: Record<string, any>):
   return response;
 }
 
-async function handleCategoryQuery(userId: string, params: Record<string, any>): Promise<string> {
+async function handleCategoryQuery(userId: string, params: Record<string, unknown>): Promise<string> {
   const category = params.category;
   
   if (!category) {
@@ -465,207 +425,9 @@ async function handleCategoryQuery(userId: string, params: Record<string, any>):
   return response;
 }
 
-async function handleDateQuery(userId: string, params: Record<string, any>): Promise<string> {
-  const timeframe = params.timeframe || 'month';
-  
-  const now = new Date();
-  let whereClause: any = { userId };
-  
-  switch (timeframe) {
-    case 'today':
-      whereClause.date = {
-        gte: new Date(now.getFullYear(), now.getMonth(), now.getDate()),
-      };
-      break;
-    case 'yesterday':
-      const yesterday = new Date(now);
-      yesterday.setDate(yesterday.getDate() - 1);
-      whereClause.date = {
-        gte: new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate()),
-        lt: new Date(now.getFullYear(), now.getMonth(), now.getDate()),
-      };
-      break;
-    case 'week':
-      const weekStart = new Date(now);
-      weekStart.setDate(weekStart.getDate() - 7);
-      whereClause.date = { gte: weekStart };
-      break;
-    case 'month':
-      whereClause.date = {
-        gte: new Date(now.getFullYear(), now.getMonth(), 1),
-      };
-      break;
-  }
-  
-  const expenses = await db.record.findMany({
-    where: whereClause,
-    orderBy: { date: 'desc' },
-  });
-  
-  if (expenses.length === 0) {
-    return `You haven't made any expenses ${timeframe === 'today' ? 'today' : `this ${timeframe}`}.`;
-  }
-  
-  const total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-  const average = total / expenses.length;
-  
-  let response = `Here's your spending ${timeframe === 'today' ? 'today' : `this ${timeframe}`}:\n\n`;
-  response += `💰 **Total: $${total.toFixed(2)}**\n`;
-  response += `📊 **Average per transaction: $${average.toFixed(2)}**\n`;
-  response += `🔢 **Number of transactions: ${expenses.length}**\n\n`;
-  
-  // Group by category
-  const categoryTotals = expenses.reduce((acc, expense) => {
-    acc[expense.category] = (acc[expense.category] || 0) + expense.amount;
-    return acc;
-  }, {} as Record<string, number>);
-  
-  response += 'Spending by category:\n';
-  Object.entries(categoryTotals)
-    .sort(([,a], [,b]) => b - a)
-    .forEach(([category, amount]) => {
-      response += `• ${category}: $${amount.toFixed(2)}\n`;
-    });
-  
-  return response;
-}
 
-async function handleAmountQuery(userId: string, params: Record<string, any>): Promise<string> {
-  const queryType = params.queryType || 'total';
-  
-  const expenses = await db.record.findMany({
-    where: { userId },
-    orderBy: { amount: queryType === 'highest' ? 'desc' : 'asc' },
-  });
-  
-  if (expenses.length === 0) {
-    return "You haven't made any expenses yet.";
-  }
-  
-  const total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-  const average = total / expenses.length;
-  
-  switch (queryType) {
-    case 'total':
-      return `Your total spending is **$${total.toFixed(2)}** across ${expenses.length} transactions.`;
-    
-    case 'average':
-      return `Your average expense is **$${average.toFixed(2)}** per transaction.`;
-    
-    case 'highest':
-      const highest = expenses[0];
-      return `Your highest expense was **$${highest.amount.toFixed(2)}** for "${highest.text}" on ${highest.date.toLocaleDateString()}.`;
-    
-    case 'lowest':
-      const lowest = expenses[0];
-      return `Your lowest expense was **$${lowest.amount.toFixed(2)}** for "${lowest.text}" on ${lowest.date.toLocaleDateString()}.`;
-    
-    default:
-      return `Your total spending is **$${total.toFixed(2)}** with an average of **$${average.toFixed(2)}** per transaction.`;
-  }
-}
 
-async function handleTrendQuery(userId: string, params: Record<string, any>): Promise<string> {
-  // Get expenses from last 2 months for comparison
-  const now = new Date();
-  const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-  const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-  
-  const lastMonthExpenses = await db.record.findMany({
-    where: {
-      userId,
-      date: {
-        gte: lastMonth,
-        lt: thisMonth,
-      },
-    },
-  });
-  
-  const thisMonthExpenses = await db.record.findMany({
-    where: {
-      userId,
-      date: {
-        gte: thisMonth,
-      },
-    },
-  });
-  
-  const lastMonthTotal = lastMonthExpenses.reduce((sum, expense) => sum + expense.amount, 0);
-  const thisMonthTotal = thisMonthExpenses.reduce((sum, expense) => sum + expense.amount, 0);
-  
-  const difference = thisMonthTotal - lastMonthTotal;
-  const percentageChange = lastMonthTotal > 0 ? (difference / lastMonthTotal) * 100 : 0;
-  
-  let response = 'Here\'s your spending trend:\n\n';
-  response += `📅 **Last month**: $${lastMonthTotal.toFixed(2)}\n`;
-  response += `📅 **This month**: $${thisMonthTotal.toFixed(2)}\n\n`;
-  
-  if (difference > 0) {
-    response += `📈 **Increase**: $${difference.toFixed(2)} (${percentageChange.toFixed(1)}% higher)\n`;
-  } else if (difference < 0) {
-    response += `📉 **Decrease**: $${Math.abs(difference).toFixed(2)} (${Math.abs(percentageChange).toFixed(1)}% lower)\n`;
-  } else {
-    response += `➡️ **No change**: Same spending as last month\n`;
-  }
-  
-  return response;
-}
-
-async function handleBudgetQuery(userId: string, params: Record<string, any>): Promise<string> {
-  // This would integrate with your budget system
-  // For now, return a helpful message
-  return "Budget tracking is coming soon! I can help you analyze your spending patterns to set better budgets. Try asking about your spending trends or category breakdowns.";
-}
-
-async function handleGreetingQuery(userId: string, params: Record<string, any>): Promise<string> {
-  const greetings = [
-    "Hello! 👋 I'm your personal expense assistant. I can help you analyze your spending patterns and answer questions about your expenses.",
-    "Hi there! 😊 I'm here to help you understand your spending habits. What would you like to know about your expenses?",
-    "Hey! 👋 Welcome to your expense tracker chatbot. I can help you with spending analysis, categories, trends, and more!",
-    "Good day! 🌟 I'm your expense assistant. Ask me anything about your spending - I'm here to help!"
-  ];
-  
-  return greetings[Math.floor(Math.random() * greetings.length)];
-}
-
-async function handleHelpQuery(userId: string, params: Record<string, any>): Promise<string> {
-  const helpMessages = [
-    "🤖 **I'm your Personal Expense Assistant!**",
-    "",
-    "I can help you with:",
-    "",
-    "📊 **Spending Analysis:**",
-    "• 'How much did I spend today/this week/this month?'",
-    "• 'Show me my recent expenses'",
-    "• 'What did I spend on food this month?'",
-    "",
-    "📈 **Trends & Patterns:**",
-    "• 'Show me my spending trends'",
-    "• 'How has my spending changed?'",
-    "• 'Compare this month to last month'",
-    "",
-    "💰 **Amounts & Totals:**",
-    "• 'What's my total spending?'",
-    "• 'What's my highest/lowest expense?'",
-    "• 'What's my average expense?'",
-    "",
-    "🏷️ **Categories:**",
-    "• 'Show me my spending categories'",
-    "• 'How much did I spend on transportation?'",
-    "• 'Breakdown by category'",
-    "",
-    "💡 **Insights:**",
-    "• 'Give me spending insights'",
-    "• 'Analyze my expenses'",
-    "• 'Summary of my spending'",
-    "",
-    "Just ask me anything about your expenses in natural language! 😊"
-  ];
-  
-  return helpMessages.join('\n');
-}
-
-async function handleAnalysisQuery(userId: string, params: Record<string, any>): Promise<string> {
+async function handleAnalysisQuery(userId: string, params: Record<string, unknown>): Promise<string> {
   try {
     // Get comprehensive expense data
     const allExpenses = await db.record.findMany({
@@ -700,7 +462,7 @@ async function handleAnalysisQuery(userId: string, params: Record<string, any>):
     const weekTotal = thisWeekExpenses.reduce((sum, e) => sum + e.amount, 0);
     const monthTotal = thisMonthExpenses.reduce((sum, e) => sum + e.amount, 0);
 
-    let analysis = [
+    const analysis = [
       "📊 **Your Expense Analysis:**",
       "",
       `💰 **Total Spending:** $${total.toFixed(2)} across ${allExpenses.length} transactions`,
@@ -738,20 +500,3 @@ async function handleAnalysisQuery(userId: string, params: Record<string, any>):
   }
 }
 
-async function handleGeneralQuery(userId: string, params: Record<string, any>): Promise<string> {
-  const helpMessages = [
-    "I can help you with your expenses! Try asking:",
-    "• 'How much did I spend today?'",
-    "• 'Show me my food expenses'",
-    "• 'What's my total spending this month?'",
-    "• 'What's my highest expense?'",
-    "• 'Show me my spending trends'",
-    "• 'How much did I spend on transportation?'",
-    "• 'Give me spending insights'",
-    "• 'Analyze my expenses'",
-    "",
-    "What would you like to know about your expenses?"
-  ];
-  
-  return helpMessages.join('\n');
-}

@@ -36,7 +36,7 @@ const BarChart = ({ records }: { records: Record[] }) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const [windowWidth, setWindowWidth] = useState(1024); // Default to desktop width
-  const { lastUpdate } = useExpenseRefresh();
+  useExpenseRefresh();
 
   useEffect(() => {
     // Set initial window width

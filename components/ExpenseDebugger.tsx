@@ -33,7 +33,7 @@ export default function ExpenseDebugger() {
       } else {
         setDataSource('general');
       }
-    } catch (error) {
+    } catch {
       setAnswer('Error getting answer');
     } finally {
       setLoading(false);
@@ -103,7 +103,7 @@ export default function ExpenseDebugger() {
           </div>
           
           <div className="text-xs text-gray-500 dark:text-gray-400">
-            <strong>How to tell if it's using your data:</strong>
+            <strong>How to tell if it&apos;s using your data:</strong>
             <ul className="list-disc list-inside mt-1 space-y-1">
               <li>✅ Mentions specific amounts, dates, or categories from your expenses</li>
               <li>⚡ Generic advice = cached/general response</li>
