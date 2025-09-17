@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
 
     // Get conversation history from cache
     const cacheKey = `conversation:${user.id}:${conversationId || 'default'}`;
-    const conversationHistory: ChatMessage[] = (await getConversation(cacheKey)) || [];
+    const conversationHistory: ChatMessage[] = ((await getConversation(cacheKey)) as unknown as ChatMessage[]) || [];
 
     // Add user message to history
     const userMessage: ChatMessage = {
@@ -90,16 +90,16 @@ export async function POST(request: NextRequest) {
         response = result.response;
       } else if (intent.type === 'show_expenses') {
         // Show recent expenses
-        response = await handleShowExpenses(user.id);
+        response = await handleShowExpenses();
       } else if (intent.type === 'modify_expense') {
         // Show expenses with edit/delete options
-        response = await handleModifyExpenses(user.id);
+        response = await handleModifyExpenses();
       } else if (intent.type === 'edit_expense' && intent.expenseNumber) {
         // Start edit conversation
         const result = await handleEditExpense(user.id, intent.expenseNumber);
         response = result.response;
         if (result.expense) {
-          await startEditConversation(user.id, conversationId || 'default', result.expense);
+          await startEditConversation(user.id, conversationId || 'default', result.expense as { id: string; text: string; amount: number; category: string; date: Date });
         }
       } else if (intent.type === 'delete_expense' && intent.expenseNumber) {
         // Delete specific expense
@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
     conversationHistory.push(assistantMessage);
 
     // Store updated conversation history in cache
-    await cacheConversation(cacheKey, conversationHistory);
+    await cacheConversation(cacheKey, conversationHistory as unknown as Record<string, unknown>[]);
 
     return NextResponse.json({
       response,
@@ -280,7 +280,7 @@ async function generateExpenseResponse(userId: string, query: ExpenseQuery): Pro
         },
         {
           role: "user",
-          content: query.parameters.originalMessage || `Tell me about my ${query.type}`
+          content: String(query.parameters.originalMessage || `Tell me about my ${query.type}`)
         }
       ],
       max_tokens: 250,
