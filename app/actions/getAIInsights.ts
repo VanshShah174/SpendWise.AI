@@ -25,12 +25,12 @@ export async function getAIInsights(): Promise<AIInsight[]> {
     const expenses = await db.record.findMany({
       where: {
         userId: user.clerkUserId,
-        createdAt: {
+        date: {
           gte: thirtyDaysAgo,
         },
       },
       orderBy: {
-        createdAt: 'desc',
+        date: 'desc',
       },
       take: 50, // Limit to recent 50 expenses for analysis
     });
@@ -67,7 +67,7 @@ export async function getAIInsights(): Promise<AIInsight[]> {
       amount: expense.amount,
       category: expense.category || 'Other',
       description: expense.text,
-      date: expense.createdAt.toISOString(),
+      date: expense.date.toISOString(),
     }));
 
     // Generate AI insights

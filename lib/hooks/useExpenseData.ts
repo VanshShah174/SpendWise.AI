@@ -45,7 +45,7 @@ export function useExpenseStats() {
       ]);
 
       const { record, daysWithRecords } = userRecordResult;
-      const { bestExpense, worstExpense } = rangeResult;
+      const { bestExpense, worstExpense, bestExpenseText, worstExpenseText } = rangeResult;
 
       const validRecord = record || 0;
       const validDays = daysWithRecords && daysWithRecords > 0 ? daysWithRecords : 1;
@@ -55,6 +55,8 @@ export function useExpenseStats() {
         averageExpense,
         bestExpense,
         worstExpense,
+        bestExpenseText,
+        worstExpenseText,
         validDays
       };
     },

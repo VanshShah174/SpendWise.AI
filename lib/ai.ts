@@ -46,25 +46,38 @@ export async function generateExpenseInsights(
       date: expense.date,
     }));
 
-    const prompt = `Analyze the following expense data and provide 3-4 actionable financial insights. 
-    Return a JSON array of insights with this structure:
+    // Calculate exact totals from the data
+    const categoryTotals = expensesSummary.reduce((acc, expense) => {
+      acc[expense.category] = (acc[expense.category] || 0) + expense.amount;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    const totalAmount = expensesSummary.reduce((sum, expense) => sum + expense.amount, 0);
+    const expenseCount = expensesSummary.length;
+    
+    const prompt = `CRITICAL: Use ONLY the provided calculations and data. Do NOT recalculate or assume anything.
+    
+    EXACT DATA SUMMARY:
+    - Total expenses: ${expenseCount} items
+    - Total amount: $${totalAmount.toFixed(2)}
+    - Category totals: ${JSON.stringify(categoryTotals)}
+    - Individual expenses: ${JSON.stringify(expensesSummary, null, 2)}
+    
+    STRICT RULES:
+    1. Use ONLY the exact numbers provided above
+    2. Reference the category totals object for any category calculations
+    3. Do NOT perform any mathematical calculations yourself
+    4. If mentioning category totals, use the exact values from the category totals object
+    
+    Provide 2-3 insights using ONLY these exact numbers. Return JSON array:
     {
       "type": "warning|info|success|tip",
       "title": "Brief title",
-      "message": "Detailed insight message with specific numbers when possible",
+      "message": "Insight using ONLY the exact numbers provided above",
       "action": "Actionable suggestion",
-      "confidence": 0.8
+      "confidence": 0.9
     }
-
-    Expense Data:
-    ${JSON.stringify(expensesSummary, null, 2)}
-
-    Focus on:
-    1. Spending patterns (day of week, categories)
-    2. Budget alerts (high spending areas)
-    3. Money-saving opportunities
-    4. Positive reinforcement for good habits
-
+    
     Return only valid JSON array, no additional text.`;
 
     const completion = await openai.chat.completions.create({
@@ -73,7 +86,7 @@ export async function generateExpenseInsights(
         {
           role: 'system',
           content:
-            'You are a financial advisor AI that analyzes spending patterns and provides actionable insights. Always respond with valid JSON only.',
+            'You are a precise financial analyzer. NEVER perform calculations. ONLY use the exact pre-calculated numbers provided in the prompt. Reference the category totals object directly. Do NOT add, subtract, or modify any numbers. Always respond with valid JSON only.',
         },
         {
           role: 'user',
