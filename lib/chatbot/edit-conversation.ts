@@ -17,6 +17,7 @@ export async function handleEditConversation(
   }
 
   try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updatedData: any = {};
     
     switch (field) {
@@ -91,7 +92,7 @@ export async function startEditConversation(
       text: expense.text,
       amount: expense.amount,
       category: expense.category,
-      date: expense.date
+      date: expense.date.toISOString().split('T')[0]
     },
     timestamp: new Date(),
     userId

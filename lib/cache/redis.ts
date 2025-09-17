@@ -6,6 +6,7 @@ let connectionAttempted = false;
 let useMemoryFallback = false;
 
 function buildRedisClient(): Redis {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const opts: any = {
     host: process.env.REDIS_HOST,
     port: parseInt(process.env.REDIS_PORT || "6379", 10),
@@ -62,6 +63,7 @@ async function isRedisConnected(client: Redis): Promise<boolean> {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function cacheConversation(key: string, messages: any[], ttl = 86400) {
   const client = getRedisClient();
   if (!client || useMemoryFallback || !(await isRedisConnected(client))) {
@@ -79,6 +81,7 @@ export async function cacheConversation(key: string, messages: any[], ttl = 8640
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function getConversation(key: string): Promise<any[] | null> {
   const client = getRedisClient();
   if (!client || useMemoryFallback || !(await isRedisConnected(client))) {

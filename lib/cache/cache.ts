@@ -17,6 +17,7 @@ const CACHE_TTL = {
   CATEGORY: 7200, // 2 hours for category suggestions
 } as const;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function isRedisReady(client: any): Promise<boolean> {
   try {
     if (!client || typeof client !== 'object') return false;
@@ -28,6 +29,7 @@ async function isRedisReady(client: any): Promise<boolean> {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function cacheSet(key: string, data: any, ttl: number = 3600): Promise<boolean> {
   const client = getRedisClient();
   
@@ -46,6 +48,7 @@ export async function cacheSet(key: string, data: any, ttl: number = 3600): Prom
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function cacheGet(key: string): Promise<any> {
   const client = getRedisClient();
   
@@ -70,24 +73,29 @@ export async function cacheFAQ(question: string, answer: string): Promise<void> 
 export async function getCachedFAQ(question: string): Promise<string | null> {
   const key = `${CACHE_KEYS.FAQ}${hashQuestion(question)}`;
   const cached = await cacheGet(key);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (cached as any)?.answer || null;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function cacheSpendingInsights(userId: string, insights: any[]): Promise<void> {
   const key = `${CACHE_KEYS.SPENDING_INSIGHTS}${userId}`;
   await cacheSet(key, insights, CACHE_TTL.INSIGHTS);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function getCachedSpendingInsights(userId: string): Promise<any[] | null> {
   const key = `${CACHE_KEYS.SPENDING_INSIGHTS}${userId}`;
   return await cacheGet(key);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function cacheUserSpending(userId: string, spendingData: any): Promise<void> {
   const key = `${CACHE_KEYS.USER_SPENDING}${userId}`;
   await cacheSet(key, spendingData, CACHE_TTL.SPENDING);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function getCachedUserSpending(userId: string): Promise<any> {
   const key = `${CACHE_KEYS.USER_SPENDING}${userId}`;
   return await cacheGet(key);

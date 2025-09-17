@@ -6,6 +6,7 @@ export async function handleExpenseConversation(
   userId: string, 
   conversationId: string, 
   message: string
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<{ response: string; completed?: boolean; expenseAdded?: any }> {
   
   const state = await getConversationState(userId, conversationId);

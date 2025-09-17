@@ -74,6 +74,7 @@ export async function handleShowExpenses(): Promise<string> {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function handleEditExpense(_userId: string, expenseNumber: number): Promise<{ response: string; expense?: any }> {
   try {
     const { records, error } = await getRecords();
