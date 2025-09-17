@@ -6,7 +6,7 @@ export async function handleExpenseConversation(
   userId: string, 
   conversationId: string, 
   message: string
-): Promise<{ response: string; completed?: boolean; expenseAdded?: Record<string, unknown> }> {
+): Promise<{ response: string; completed?: boolean; expenseAdded?: any }> {
   
   const state = await getConversationState(userId, conversationId);
   

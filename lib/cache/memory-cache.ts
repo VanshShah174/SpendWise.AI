@@ -1,7 +1,7 @@
 // In-memory fallback cache when Redis is unavailable
-const cache = new Map<string, { data: unknown; expires: number }>();
+const cache = new Map<string, { data: any; expires: number }>();
 
-export function setMemoryCache(key: string, data: unknown, ttlSeconds = 3600) {
+export function setMemoryCache(key: string, data: any, ttlSeconds = 3600) {
   const expires = Date.now() + (ttlSeconds * 1000);
   cache.set(key, { data, expires });
   
@@ -14,7 +14,7 @@ export function setMemoryCache(key: string, data: unknown, ttlSeconds = 3600) {
   }, ttlSeconds * 1000);
 }
 
-export function getMemoryCache(key: string): unknown {
+export function getMemoryCache(key: string): any {
   const entry = cache.get(key);
   if (!entry) return null;
   

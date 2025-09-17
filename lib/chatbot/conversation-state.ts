@@ -28,7 +28,7 @@ const CONVERSATION_TTL = 1800; // 30 minutes
 
 export async function getConversationState(userId: string, conversationId: string): Promise<ExpenseConversationState | null> {
   const key = `expense_conversation:${userId}:${conversationId}`;
-  return await cacheGet(key);
+  return await cacheGet(key) as ExpenseConversationState | null;
 }
 
 export async function setConversationState(userId: string, conversationId: string, state: ExpenseConversationState): Promise<void> {
@@ -43,7 +43,7 @@ export async function clearConversationState(userId: string, conversationId: str
 
 export async function getEditState(userId: string, conversationId: string): Promise<EditConversationState | null> {
   const key = `edit_conversation:${userId}:${conversationId}`;
-  return await cacheGet(key);
+  return await cacheGet(key) as EditConversationState | null;
 }
 
 export async function setEditState(userId: string, conversationId: string, state: EditConversationState): Promise<void> {

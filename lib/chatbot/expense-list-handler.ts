@@ -74,7 +74,7 @@ export async function handleShowExpenses(): Promise<string> {
   }
 }
 
-export async function handleEditExpense(_userId: string, expenseNumber: number): Promise<{ response: string; expense?: Record<string, unknown> }> {
+export async function handleEditExpense(_userId: string, expenseNumber: number): Promise<{ response: string; expense?: any }> {
   try {
     const { records, error } = await getRecords();
     

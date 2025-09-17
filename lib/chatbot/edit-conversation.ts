@@ -17,7 +17,7 @@ export async function handleEditConversation(
   }
 
   try {
-    const updatedData: Record<string, unknown> = {};
+    const updatedData: any = {};
     
     switch (field) {
       case 'description':
@@ -60,7 +60,7 @@ export async function handleEditConversation(
       await clearEditState(userId, conversationId);
       
       const fieldName = field === 'description' ? 'description' : field;
-      const displayValue = field === 'amount' ? `$${updatedData.amount.toFixed(2)}` : 
+      const displayValue = field === 'amount' ? `$${(updatedData.amount as number).toFixed(2)}` : 
                           field === 'description' ? updatedData.text : updatedData.category;
       
       return {

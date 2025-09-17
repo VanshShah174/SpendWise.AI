@@ -6,7 +6,7 @@ let connectionAttempted = false;
 let useMemoryFallback = false;
 
 function buildRedisClient(): Redis {
-  const opts: Record<string, unknown> = {
+  const opts: any = {
     host: process.env.REDIS_HOST,
     port: parseInt(process.env.REDIS_PORT || "6379", 10),
     username: process.env.REDIS_USERNAME || "default",
@@ -62,7 +62,7 @@ async function isRedisConnected(client: Redis): Promise<boolean> {
   }
 }
 
-export async function cacheConversation(key: string, messages: Record<string, unknown>[], ttl = 86400) {
+export async function cacheConversation(key: string, messages: any[], ttl = 86400) {
   const client = getRedisClient();
   if (!client || useMemoryFallback || !(await isRedisConnected(client))) {
     setMemoryCache(key, messages, ttl);
@@ -79,7 +79,7 @@ export async function cacheConversation(key: string, messages: Record<string, un
   }
 }
 
-export async function getConversation(key: string): Promise<Record<string, unknown>[] | null> {
+export async function getConversation(key: string): Promise<any[] | null> {
   const client = getRedisClient();
   if (!client || useMemoryFallback || !(await isRedisConnected(client))) {
     return getMemoryCache(key);
