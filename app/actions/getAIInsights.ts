@@ -15,7 +15,7 @@ export async function getAIInsights(): Promise<AIInsight[]> {
     // Check cache first
     const cachedInsights = await getCachedSpendingInsights(user.clerkUserId);
     if (cachedInsights) {
-      return cachedInsights;
+      return cachedInsights as AIInsight[];
     }
 
     // Get user's recent expenses (last 30 days)
