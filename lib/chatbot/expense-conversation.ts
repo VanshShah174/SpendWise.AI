@@ -2,6 +2,36 @@ import { ExpenseConversationState, getConversationState, setConversationState, c
 import { categorizeExpense } from '../ai';
 import addExpenseRecordAction from '@/app/actions/addExpenseRecord';
 
+// Parse natural language expense input
+function parseNaturalExpense(message: string): { description?: string; amount?: number } | null {
+  const lowerMessage = message.toLowerCase();
+  
+  // Patterns to extract amount and description
+  const patterns = [
+    /i\s+spent\s+\$?(\d+(?:\.\d{2})?)\s+on\s+(.+)/,
+    /i\s+bought\s+(.+)\s+for\s+\$?(\d+(?:\.\d{2})?)/,
+    /i\s+paid\s+\$?(\d+(?:\.\d{2})?)\s+for\s+(.+)/,
+    /spent\s+\$?(\d+(?:\.\d{2})?)\s+on\s+(.+)/,
+    /paid\s+\$?(\d+(?:\.\d{2})?)\s+for\s+(.+)/,
+    /\$?(\d+(?:\.\d{2})?)\s+for\s+(.+)/,
+    /\$?(\d+(?:\.\d{2})?)\s+on\s+(.+)/
+  ];
+  
+  for (const pattern of patterns) {
+    const match = lowerMessage.match(pattern);
+    if (match) {
+      const amount = parseFloat(match[1]);
+      const description = match[2]?.trim();
+      
+      if (amount > 0 && description && description.length > 1) {
+        return { amount, description };
+      }
+    }
+  }
+  
+  return null;
+}
+
 export async function handleExpenseConversation(
   userId: string, 
   conversationId: string, 
@@ -11,20 +41,38 @@ export async function handleExpenseConversation(
   
   const state = await getConversationState(userId, conversationId);
   
-  // Start new conversation only for add expense intent
+  // Start new conversation
   if (!state) {
-    // Check if this is actually an add expense request
-    const lowerMessage = message.toLowerCase();
-    const addPatterns = ['add expense', 'create expense', 'new expense', 'can you add'];
+    // Try to parse natural language expense
+    const parsedExpense = parseNaturalExpense(message);
     
-    if (!addPatterns.some(pattern => lowerMessage.includes(pattern))) {
-      // This shouldn't be handled by expense conversation
+    if (parsedExpense) {
+      // We have both amount and description, skip to category
+      const newState: ExpenseConversationState = {
+        step: 'category',
+        data: {
+          description: parsedExpense.description,
+          amount: parsedExpense.amount
+        },
+        timestamp: new Date(),
+        userId
+      };
+      await setConversationState(userId, conversationId, newState);
+      
+      // Get AI category suggestion
+      let suggestedCategory = 'Other';
+      try {
+        suggestedCategory = await categorizeExpense(parsedExpense.description || '');
+      } catch {
+        // Category suggestion failed, use default
+      }
+      
       return {
-        response: "I'm not sure what you're asking for. Try 'add expense' to add a new expense, or 'show expenses' to see your recent expenses.",
-        completed: true
+        response: `Perfect! I've got your expense: "${parsedExpense.description}" for $${(parsedExpense.amount || 0).toFixed(2)} 💰\n\nI suggest the category "${suggestedCategory}" - does that work?\n\nType "yes" to accept, or choose: Food, Transportation, Shopping, Entertainment, Bills, Healthcare, Other`
       };
     }
     
+    // Fallback to guided conversation
     const newState: ExpenseConversationState = {
       step: 'description',
       data: {},
@@ -73,6 +121,29 @@ export async function handleExpenseConversation(
 }
 
 async function handleDescriptionStep(userId: string, conversationId: string, state: ExpenseConversationState, message: string) {
+  // Try to parse natural language first
+  const parsedExpense = parseNaturalExpense(message);
+  
+  if (parsedExpense) {
+    // We got both description and amount, skip to category
+    state.data.description = parsedExpense.description;
+    state.data.amount = parsedExpense.amount;
+    state.step = 'category';
+    await setConversationState(userId, conversationId, state);
+    
+    // Get AI category suggestion
+    let suggestedCategory = 'Other';
+    try {
+      suggestedCategory = await categorizeExpense(parsedExpense.description || '');
+    } catch {
+      // Category suggestion failed, use default
+    }
+    
+    return {
+      response: `Perfect! I've got your expense: "${parsedExpense.description}" for $${(parsedExpense.amount || 0).toFixed(2)} 💰\n\nI suggest the category "${suggestedCategory}" - does that work?\n\nType "yes" to accept, or choose: Food, Transportation, Shopping, Entertainment, Bills, Healthcare, Other`
+    };
+  }
+  
   const description = message.trim();
   
   if (description.length < 2) {
