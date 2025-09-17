@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Chatbot from '@/components/Chatbot';
+import { useChatbot } from '@/contexts/ChatbotContext';
 
 const ChatbotWrapper = () => {
-  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+  const { isChatbotOpen, toggleChatbot } = useChatbot();
   const [hasInteracted, setHasInteracted] = useState(false);
 
   // Show welcome animation after a delay
@@ -26,7 +27,7 @@ const ChatbotWrapper = () => {
   }, [hasInteracted]);
 
   const handleToggle = () => {
-    setIsChatbotOpen(!isChatbotOpen);
+    toggleChatbot();
     setHasInteracted(true);
   };
 
