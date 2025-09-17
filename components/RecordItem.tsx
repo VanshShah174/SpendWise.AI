@@ -213,8 +213,20 @@ const RecordItem = ({ record }: { record: Record }) => {
                 </div>
               </div>
 
-              <div className='text-sm text-gray-600 dark:text-gray-400 mt-3'>
-                <p className='truncate break-words line-clamp-2'>{record?.text}</p>
+              <div className='mt-4 p-3 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-600 rounded-lg border border-gray-200 dark:border-gray-600'>
+                <div className='flex items-start gap-2'>
+                  <div className='w-2 h-2 bg-gradient-to-r from-emerald-500 to-green-500 rounded-full mt-2 flex-shrink-0'></div>
+                  <div className='flex-1'>
+                    <p className='text-sm font-medium text-gray-800 dark:text-gray-200 leading-relaxed'>
+                      {record?.text}
+                    </p>
+                    <div className='flex items-center gap-2 mt-2'>
+                      <span className='text-xs text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 px-2 py-1 rounded-full border'>
+                        💰 Expense
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </>
           )}

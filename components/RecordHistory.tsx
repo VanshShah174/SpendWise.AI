@@ -4,7 +4,7 @@ import RecordItem from './RecordItem';
 import { Record } from '@/types/Record';
 import { useExpenseRecords } from '@/lib/hooks/useExpenseData';
 import { useState, useMemo } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const RecordHistory = () => {
   const { data: records = [], error, isLoading: loading } = useExpenseRecords();
@@ -12,6 +12,8 @@ const RecordHistory = () => {
   const [selectedMonth, setSelectedMonth] = useState('All');
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const [isMonthDropdownOpen, setIsMonthDropdownOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
   
   // Get unique categories from records
   const categories = useMemo(() => {
@@ -46,6 +48,18 @@ const RecordHistory = () => {
     
     return filtered;
   }, [records, selectedCategory, selectedMonth]);
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredRecords.length / itemsPerPage);
+  const paginatedRecords = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredRecords.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredRecords, currentPage, itemsPerPage]);
+
+  // Reset to first page when filters change
+  useMemo(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, selectedMonth]);
 
   if (loading) {
     return (
@@ -225,12 +239,54 @@ const RecordHistory = () => {
         </div>
       </div>
       <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4'>
-        {filteredRecords.map((record: Record) => (
+        {paginatedRecords.map((record: Record) => (
           <RecordItem key={record.id} record={record} />
         ))}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className='flex items-center justify-between mt-6 pt-4 border-t border-gray-200 dark:border-gray-700'>
+          <div className='text-sm text-gray-600 dark:text-gray-400'>
+            Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, filteredRecords.length)} of {filteredRecords.length} expenses
+          </div>
+          <div className='flex items-center gap-2'>
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className='flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200'
+            >
+              <ChevronLeft className='w-4 h-4' />
+              Previous
+            </button>
+            <div className='flex items-center gap-1'>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`w-10 h-10 text-sm font-medium rounded-lg transition-all duration-200 ${
+                    currentPage === page
+                      ? 'bg-gradient-to-r from-emerald-500 to-green-500 text-white shadow-lg'
+                      : 'text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className='flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200'
+            >
+              Next
+              <ChevronRight className='w-4 h-4' />
+            </button>
+          </div>
+        </div>
+      )}
       
-      {filteredRecords.length === 0 && (selectedCategory !== 'All' || selectedMonth !== 'All') && (
+      {paginatedRecords.length === 0 && filteredRecords.length === 0 && (selectedCategory !== 'All' || selectedMonth !== 'All') && (
         <div className='text-center py-6'>
           <div className='w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 rounded-2xl flex items-center justify-center mx-auto mb-4'>
             <span className='text-2xl'>🔍</span>

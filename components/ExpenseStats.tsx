@@ -81,6 +81,11 @@ const ExpenseStats = () => {
                   <p className='text-lg font-bold text-red-600 dark:text-red-300'>
                     {stats.bestExpense !== undefined ? `$${stats.bestExpense}` : 'No data'}
                   </p>
+                  {stats.bestExpenseText && (
+                    <p className='text-xs text-gray-600 dark:text-gray-400 mt-1 truncate'>
+                      {stats.bestExpenseText}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -102,6 +107,11 @@ const ExpenseStats = () => {
                       ? `$${stats.worstExpense}`
                       : 'No data'}
                   </p>
+                  {stats.worstExpenseText && (
+                    <p className='text-xs text-gray-600 dark:text-gray-400 mt-1 truncate'>
+                      {stats.worstExpenseText}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
