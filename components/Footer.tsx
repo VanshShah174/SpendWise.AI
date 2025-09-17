@@ -18,7 +18,7 @@ const Footer = () => {
                 SpendWise.AI
               </h2>
             </div>
-            <p className='text-gray-600 dark:text-gray-400 leading-relaxed max-w-sm'>
+            <p className='text-gray-600 dark:text-gray-400 leading-relaxed  max-w-sm'>
               Intelligent financial management powered by AI. Track your
               expenses, manage your budget, and gain insights into your spending
               patterns.
