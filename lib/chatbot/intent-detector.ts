@@ -11,6 +11,27 @@ export interface UserIntent {
 export function detectUserIntent(question: string): UserIntent {
   const lowerQuestion = question.toLowerCase().trim();
   
+  // Natural language expense patterns (highest priority)
+  const naturalExpensePatterns = [
+    /i\s+spent\s+\$?\d+/,
+    /i\s+bought\s+.+\s+for\s+\$?\d+/,
+    /i\s+paid\s+\$?\d+/,
+    /bought\s+.+\s+for\s+\$?\d+/,
+    /spent\s+\$?\d+\s+on/,
+    /paid\s+\$?\d+\s+for/,
+    /\$\d+\s+for\s+\w+/,
+    /\$\d+\s+on\s+\w+/
+  ];
+  
+  // Check for natural language expense first
+  if (naturalExpensePatterns.some(pattern => pattern.test(lowerQuestion))) {
+    return {
+      type: 'add_expense',
+      confidence: 0.95,
+      startConversation: true
+    };
+  }
+  
   // Intent patterns
   const addExpensePatterns = [
     'add expense', 'create expense', 'new expense', 'record expense', 
@@ -18,8 +39,9 @@ export function detectUserIntent(question: string): UserIntent {
   ];
   
   const analyzePatterns = [
-    'how much did i spend', 'how much have i spent', 'what did i spend', 'show me my', 'analyze', 'total', 
-    'biggest', 'highest', 'category breakdown', 'spending', 'my expenses', 'expense analysis'
+    'how much did i spend', 'how much have i spent', 'what did i spend', 'analyze', 'total', 
+    'biggest', 'highest', 'category breakdown', 'spending category', 'expense analysis',
+    'what\'s my biggest', 'which category', 'spending patterns', 'breakdown'
   ];
   
   const modifyPatterns = [
@@ -27,8 +49,8 @@ export function detectUserIntent(question: string): UserIntent {
   ];
   
   const showExpensesPatterns = [
-    'show me my', 'list my', 'recent expenses', 'my expenses', 'expense list',
-    'view expenses', 'see my expenses'
+    'show me my recent', 'show me my expenses', 'list my', 'recent expenses', 'my expenses', 'expense list',
+    'view expenses', 'see my expenses', 'show recent', 'list expenses'
   ];
   
   const generalAdvicePatterns = [
@@ -69,7 +91,16 @@ export function detectUserIntent(question: string): UserIntent {
     };
   }
 
-  // Check for analysis intent FIRST (before add expense)
+  // Check for show expenses intent FIRST (most specific)
+  if (showExpensesPatterns.some(pattern => lowerQuestion.includes(pattern))) {
+    return {
+      type: 'show_expenses',
+      confidence: 0.9,
+      startConversation: true
+    };
+  }
+
+  // Check for analysis intent (before add expense)
   if (analyzePatterns.some(pattern => lowerQuestion.includes(pattern))) {
     return {
       type: 'analyze_expenses',
@@ -77,16 +108,7 @@ export function detectUserIntent(question: string): UserIntent {
     };
   }
 
-  // Check for add expense intent
-  if (addExpensePatterns.some(pattern => lowerQuestion.includes(pattern))) {
-    return {
-      type: 'add_expense',
-      confidence: 0.9,
-      startConversation: true
-    };
-  }
-
-  // Check for modify expense intent BEFORE show expenses
+  // Check for modify expense intent
   if (modifyPatterns.some(pattern => lowerQuestion.includes(pattern))) {
     return {
       type: 'modify_expense',
@@ -95,10 +117,10 @@ export function detectUserIntent(question: string): UserIntent {
     };
   }
 
-  // Check for show expenses intent
-  if (showExpensesPatterns.some(pattern => lowerQuestion.includes(pattern))) {
+  // Check for explicit add expense intent
+  if (addExpensePatterns.some(pattern => lowerQuestion.includes(pattern))) {
     return {
-      type: 'show_expenses',
+      type: 'add_expense',
       confidence: 0.9,
       startConversation: true
     };
@@ -112,8 +134,10 @@ export function detectUserIntent(question: string): UserIntent {
     };
   }
 
+  // If no specific pattern matches, treat as general analysis/question
+  // This prevents falling into expense conversation mode
   return {
-    type: 'unknown',
-    confidence: 0.5
+    type: 'analyze_expenses',
+    confidence: 0.3 // Low confidence, will go to OpenAI
   };
 }

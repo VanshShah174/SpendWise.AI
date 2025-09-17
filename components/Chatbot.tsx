@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, X, Minimize2, Maximize2, Sparkles, MessageCircle, Trash2 } from 'lucide-react';
 import { useExpenseContext } from '@/contexts/ExpenseContext';
+import { useChatbot } from '@/contexts/ChatbotContext';
 
 interface Message {
   id: string;
@@ -19,8 +20,8 @@ interface ChatbotProps {
 
 const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onToggle }) => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const { inputMessage, setInputMessage } = useChatbot();
   const [isMinimized, setIsMinimized] = useState(false);
   const [showWelcomePopup, setShowWelcomePopup] = useState(false);
   const [showHoverTooltip, setShowHoverTooltip] = useState(false);

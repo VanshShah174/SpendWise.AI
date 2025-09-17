@@ -17,7 +17,11 @@ export async function handleModifyExpenses(): Promise<string> {
     let response = `📋 **Your Recent Expenses:**\n\n`;
     
     recentExpenses.forEach((expense, index) => {
-      const date = new Date(expense.createdAt).toLocaleDateString();
+      const date = new Date(expense.date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
       response += `${index + 1}. **${expense.text}** - $${expense.amount.toFixed(2)}\n`;
       response += `   📅 ${date} | 🏷️ ${expense.category}\n\n`;
     });
@@ -55,7 +59,11 @@ export async function handleShowExpenses(): Promise<string> {
     let response = `📋 **Your Recent Expenses:**\n\n`;
     
     recentExpenses.forEach((expense, index) => {
-      const date = new Date(expense.createdAt).toLocaleDateString();
+      const date = new Date(expense.date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
       response += `${index + 1}. **${expense.text}** - $${expense.amount.toFixed(2)}\n`;
       response += `   📅 ${date} | 🏷️ ${expense.category}\n\n`;
     });
