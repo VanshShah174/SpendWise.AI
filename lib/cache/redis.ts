@@ -86,7 +86,7 @@ async function isRedisConnected(client: Redis): Promise<boolean> {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function cacheConversation(key: string, messages: any[], ttl = 86400) {
+export async function cacheConversation(key: string, messages: any[] | null, ttl = 86400) {
   console.log("💾 Caching conversation:", key);
   const client = getRedisClient();
   if (!client || useMemoryFallback || !(await isRedisConnected(client))) {
@@ -95,7 +95,11 @@ export async function cacheConversation(key: string, messages: any[], ttl = 8640
     return true;
   }
   try {
-    await client.setex(key, ttl, JSON.stringify(messages));
+    if (messages === null) {
+      await client.del(key);
+    } else {
+      await client.setex(key, ttl, JSON.stringify(messages));
+    }
     return true;
   } catch (error: unknown) {
     console.warn("Redis cache failed, using memory:", error instanceof Error ? error.message : error);
