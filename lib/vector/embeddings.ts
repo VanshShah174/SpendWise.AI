@@ -7,6 +7,11 @@ const embeddings = new OpenAIEmbeddings({
 });
 
 export async function createExpenseEmbedding(expenseId: string, text: string, metadata: Record<string, unknown>) {
+  if (!expenseCollection) {
+    console.warn('Astra DB not configured, skipping embedding creation');
+    return;
+  }
+  
   const vector = await embeddings.embedQuery(text);
   
   await expenseCollection.insertOne({
@@ -19,6 +24,11 @@ export async function createExpenseEmbedding(expenseId: string, text: string, me
 }
 
 export async function searchSimilarExpenses(query: string, limit = 5, userId?: string) {
+  if (!expenseCollection) {
+    console.warn('Astra DB not configured, returning empty results');
+    return [];
+  }
+  
   const queryVector = await embeddings.embedQuery(query);
   
   // Build filter - include userId if provided

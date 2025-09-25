@@ -10,7 +10,7 @@ export async function getExpenseContext(query: string, userId: string) {
   const recentExpenses = result.records || [];
   
   return {
-    similarExpenses: similarExpenses.map(exp => ({
+    similarExpenses: similarExpenses.map((exp: any) => ({
       text: exp.text,
       metadata: exp.metadata,
       similarity: exp.$similarity

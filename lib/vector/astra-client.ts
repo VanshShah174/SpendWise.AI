@@ -1,8 +1,14 @@
 import { DataAPIClient } from '@datastax/astra-db-ts';
 
-const client = new DataAPIClient(process.env.ASTRA_DB_APPLICATION_TOKEN!);
-const db = client.db(process.env.ASTRA_DB_API_ENDPOINT!);
+// Only initialize if environment variables are available
+let client: DataAPIClient | null = null;
+let db: any = null;
+let expenseCollection: any = null;
 
-export const expenseCollection = db.collection('expense_embeddings');
+if (process.env.ASTRA_DB_APPLICATION_TOKEN && process.env.ASTRA_DB_API_ENDPOINT) {
+  client = new DataAPIClient(process.env.ASTRA_DB_APPLICATION_TOKEN);
+  db = client.db(process.env.ASTRA_DB_API_ENDPOINT);
+  expenseCollection = db.collection('expense_embeddings');
+}
 
-export { db, client };
+export { db, client, expenseCollection };

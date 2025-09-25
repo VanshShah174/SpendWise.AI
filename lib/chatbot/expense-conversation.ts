@@ -8,8 +8,8 @@ async function getSmartSuggestions(description: string): Promise<string> {
   try {
     const similarExpenses = await searchSimilarExpenses(description, 3);
     if (similarExpenses.length > 0) {
-      const categories = [...new Set(similarExpenses.map(e => e.metadata?.category).filter(Boolean))];
-      const avgAmount = similarExpenses.reduce((sum, e) => sum + (e.metadata?.amount || 0), 0) / similarExpenses.length;
+      const categories = [...new Set(similarExpenses.map((e: any) => e.metadata?.category).filter(Boolean))];
+      const avgAmount = similarExpenses.reduce((sum: number, e:any) => sum + (e.metadata?.amount || 0), 0) / similarExpenses.length;
       
       return `\n\n💡 **Smart Suggestion**: Based on your similar expenses, you usually categorize "${description}" as ${categories[0]} and spend around $${avgAmount.toFixed(2)}.`;
     }
