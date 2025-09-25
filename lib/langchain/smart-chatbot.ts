@@ -58,7 +58,7 @@ export async function generateSmartExpenseResponse(
     // Execute the chain
     const response = await chain.invoke({
       userMessage,
-      similarExpenses: JSON.stringify(similarExpenses.map(exp => ({
+      similarExpenses: JSON.stringify(similarExpenses.map((exp: any) => ({
         text: exp.text,
         amount: exp.metadata?.amount,
         category: exp.metadata?.category,

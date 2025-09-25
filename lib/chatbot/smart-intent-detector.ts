@@ -26,7 +26,7 @@ export async function detectSmartIntent(userMessage: string, userId?: string): P
     if (userId) {
       try {
         const similarExpenses = await searchSimilarExpenses(userMessage, 3);
-        expenseContext = `User's similar expenses: ${JSON.stringify(similarExpenses.map(e => ({
+        expenseContext = `User's similar expenses: ${JSON.stringify(similarExpenses.map((e: any) => ({
           text: e.text,
           amount: e.metadata?.amount,
           category: e.metadata?.category
