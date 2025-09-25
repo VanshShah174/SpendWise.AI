@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { currentUser } from '@clerk/nextjs/server';
-import { db } from '@/lib/db';
+
 import { getConversation, cacheConversation } from '@/lib/cache/redis';
 import { detectUserIntent } from '@/lib/chatbot/intent-detector';
+import { detectSmartIntent } from '@/lib/chatbot/smart-intent-detector';
+import { generateContextualResponse } from '@/lib/chatbot/smart-response-generator';
 import { handleExpenseConversation } from '@/lib/chatbot/expense-conversation';
 import { getConversationState, getEditState, clearEditState, clearConversationState } from '@/lib/chatbot/conversation-state';
 import { handleShowExpenses, handleDeleteExpense, handleEditExpense, handleModifyExpenses } from '@/lib/chatbot/expense-list-handler';
@@ -50,7 +52,11 @@ export async function POST(request: NextRequest) {
     };
     conversationHistory.push(userMessage);
 
-    // Check intent first for new conversations
+    // Use AI-powered intent detection with RAG context
+    const smartIntent = await detectSmartIntent(message, user.id);
+    // console.log('🧠 Smart Intent:', smartIntent);
+    
+    // Fallback to pattern-based detection if needed
     const intent = detectUserIntent(message);
     let response: string;
     let expenseAdded: Record<string, unknown> | null = null;
@@ -177,12 +183,16 @@ export async function POST(request: NextRequest) {
       }
       await cacheConversation(smartEditFieldKey, null); // Clear pending state
     } else if (expenseState && !intent.startConversation) {
-      // Continue expense conversation unless it's a clear analysis question
+      // Continue expense conversation unless it's a clear analysis/advice question
       const isAnalysisQuestion = message.toLowerCase().includes('biggest') || 
                                 message.toLowerCase().includes('category') ||
                                 message.toLowerCase().includes('how much') ||
                                 message.toLowerCase().includes('show me') ||
-                                message.toLowerCase().includes('analyze');
+                                message.toLowerCase().includes('analyze') ||
+                                message.toLowerCase().includes('budget tips') ||
+                                message.toLowerCase().includes('advice') ||
+                                message.toLowerCase().includes('help') ||
+                                intent.type === 'general_advice';
       
       if (!isAnalysisQuestion) {
         const result = await handleExpenseConversation(user.id, conversationId || 'default', message);
@@ -215,8 +225,17 @@ export async function POST(request: NextRequest) {
         await clearEditState(user.id, conversationId || 'default');
       }
       
-      if (intent.startConversation && intent.type === 'add_expense') {
-        // Start expense conversation
+      if (intent.type === 'general_advice' || smartIntent.type === 'general') {
+        // Handle general advice questions
+        if (smartIntent.confidence > 0.6) {
+          response = await generateContextualResponse(message, user.id, smartIntent);
+        } else {
+          const query = parseExpenseQuery(message);
+          response = await generateExpenseResponse(user.id, query);
+        }
+      } else if ((intent.startConversation && intent.type === 'add_expense') || 
+          (smartIntent.type === 'add_expense' && smartIntent.confidence > 0.7)) {
+        // Start expense conversation using smart intent
         const result = await handleExpenseConversation(user.id, conversationId || 'default', message);
         response = result.response;
       } else if (intent.type === 'show_expenses') {
@@ -256,9 +275,13 @@ export async function POST(request: NextRequest) {
           await cacheConversation(`smart_edit:${user.id}:${conversationId || 'default'}`, result.foundExpenses);
         }
       } else {
-        // For all other questions, use AI
-        const query = parseExpenseQuery(message);
-        response = await generateExpenseResponse(user.id, query);
+        // Use smart RAG-powered response for ALL questions including expense analysis
+        if (smartIntent.confidence > 0.6) {
+          response = await generateContextualResponse(message, user.id, smartIntent);
+        } else {
+          // Use RAG for expense analysis too
+          response = await generateContextualResponse(message, user.id, { type: 'analyze_expenses', confidence: 0.8, reasoning: 'Expense analysis query' });
+        }
       }
     }
 
@@ -292,7 +315,17 @@ export async function POST(request: NextRequest) {
 function parseExpenseQuery(message: string): ExpenseQuery {
   const lowerMessage = message.toLowerCase();
   
-  // Check for show/view queries first (highest priority)
+  // Budget/advice queries (highest priority)
+  if (lowerMessage.includes('budget tips') || lowerMessage.includes('budget advice') ||
+      lowerMessage.includes('save money') || lowerMessage.includes('financial advice') ||
+      lowerMessage.includes('money tips') || lowerMessage.includes('reduce expenses')) {
+    return {
+      type: 'budget',
+      parameters: { originalMessage: message },
+    };
+  }
+  
+  // Check for show/view queries
   if (lowerMessage.includes('show') || lowerMessage.includes('recent') || 
       lowerMessage.includes('my expenses') || lowerMessage.includes('biggest') ||
       lowerMessage.includes('what') || lowerMessage.includes('how much')) {
@@ -342,20 +375,55 @@ async function generateExpenseResponse(userId: string, query: ExpenseQuery): Pro
     // Parse date filters from the message
     const dateFilter = parseDateFromMessage(originalMessage);
     
-    // Build database query with date filtering
+    // For "this month" queries, ensure we get the correct date range
     const whereClause: { userId: string; date?: { gte: Date; lte: Date } } = { userId };
-    if (dateFilter.start && dateFilter.end) {
+    
+    if (originalMessage.includes('this month')) {
+      // Force current month calculation
+      const now = new Date();
+      const start = new Date(now.getFullYear(), now.getMonth(), 1);
+      const end = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+      whereClause.date = { gte: start, lte: end };
+      // console.log('📅 Forced this month filter:', { start, end, currentMonth: now.getMonth() + 1 });
+    } else if (dateFilter.start && dateFilter.end) {
       whereClause.date = {
         gte: dateFilter.start,
         lte: dateFilter.end
       };
+      // console.log('📅 Date filter applied:', { dateFilter });
     }
     
-    const expenses = await db.record.findMany({
-      where: whereClause,
-      orderBy: { date: 'desc' },
-    });
+    // Use the proper getRecords action to ensure user authentication
+    const { records: allRecords, error: recordsError } = await (await import('@/app/actions/getRecords')).default();
+    
+    if (recordsError || !allRecords) {
+      return `❌ Sorry, I couldn't fetch your expenses right now. Please try again later.`;
+    }
+    
+    // Apply date filtering to the user's records
+    let expenses = allRecords;
+    if (whereClause.date) {
+      expenses = allRecords.filter(record => {
+        const recordDate = new Date(record.date);
+        return recordDate >= whereClause.date!.gte && recordDate <= whereClause.date!.lte;
+      });
+    }
+    
+    // console.log('📊 Query result:', {
+    //   totalExpenses: expenses.length,
+    //   totalAmount: expenses.reduce((sum, e) => sum + e.amount, 0),
+    //   dateRange: whereClause.date,
+    //   expenseDetails: expenses.map(e => ({ text: e.text, amount: e.amount, date: e.date }))
+    // });
 
+    // Calculate totals first
+    const totalAmount = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+    
+    // Handle budget advice requests
+    if (query.type === 'budget') {
+      return `💡 **Smart Budget Tips:**\n\n• **Track Every Expense**: Use this app to monitor all spending\n• **50/30/20 Rule**: 50% needs, 30% wants, 20% savings\n• **Review Monthly**: Check your spending patterns regularly\n• **Set Category Limits**: Budget for each expense category\n• **Emergency Fund**: Save 3-6 months of expenses\n• **Automate Savings**: Set up automatic transfers\n\n💰 **Based on your data**: You've spent $${totalAmount.toFixed(2)} recently. Consider reviewing your biggest categories for potential savings!`;
+    }
+    
     // Check if this is the specific "biggest spending category" question
     if (originalMessage.includes('biggest') && originalMessage.includes('category')) {
       // Calculate category totals directly
@@ -380,8 +448,7 @@ async function generateExpenseResponse(userId: string, query: ExpenseQuery): Pro
       return `📊 **Your Biggest Spending Category ${timeFrame}:**\n\n🏷️ **${category}**: $${total.toFixed(2)}\n📈 That's ${percentage}% of your total spending!\n\n💰 **Total Expenses**: $${totalExpenses.toFixed(2)}`;
     }
 
-    // Calculate totals and breakdown for direct responses
-    const totalAmount = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+    // Calculate category breakdown for direct responses
     const categoryTotals = expenses.reduce((acc, expense) => {
       acc[expense.category] = (acc[expense.category] || 0) + expense.amount;
       return acc;
@@ -392,7 +459,7 @@ async function generateExpenseResponse(userId: string, query: ExpenseQuery): Pro
       text: e.text,
       amount: parseFloat(e.amount.toFixed(2)),
       category: e.category,
-      date: e.date.toLocaleDateString('en-US', {
+      date: new Date(e.date).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
         day: 'numeric'
@@ -404,7 +471,7 @@ async function generateExpenseResponse(userId: string, query: ExpenseQuery): Pro
       messages: [
         {
           role: 'system',
-          content: `You are a helpful financial assistant. Analyze the user's expenses and provide insights. Keep responses concise and friendly. Use emojis appropriately. \n\nCRITICAL: When providing spending breakdowns, ONLY use the exact data provided. Do not calculate or estimate amounts. The total spending is $${totalAmount.toFixed(2)} and category breakdown is: ${JSON.stringify(categoryTotals)}. \n\nToday's date is ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}.`,
+          content: `You are a helpful financial assistant. Analyze the user's expenses and provide insights. Keep responses concise and friendly. Use emojis appropriately. \n\nFor budget advice questions, provide practical money-saving tips and budgeting strategies.\n\nCRITICAL: When providing spending breakdowns, SHOW ALL EXPENSES provided in the data. Do not truncate or limit the list. The total spending is $${totalAmount.toFixed(2)} and category breakdown is: ${JSON.stringify(categoryTotals)}. \n\nToday's date is ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}.`,
         },
         {
           role: 'user',
@@ -455,16 +522,36 @@ function parseDateFromMessage(message: string): { start?: Date; end?: Date; desc
     }
   }
   
-  // Check for "this month"
+  // Check for "this month" - should be highest priority
   if (lowerMessage.includes('this month')) {
     const now = new Date();
     const start = new Date(now.getFullYear(), now.getMonth(), 1);
     const end = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+    // console.log('📅 This month filter:', { start, end, currentMonth: now.getMonth() });
     return { 
       start, 
       end, 
       description: 'this month' 
     };
+  }
+  
+  // Check for current month without "this month" phrase
+  if (!lowerMessage.includes('last') && !lowerMessage.includes('previous')) {
+    const now = new Date();
+    const currentMonthName = Object.keys(monthPatterns).find(name => 
+      monthPatterns[name as keyof typeof monthPatterns] === now.getMonth()
+    );
+    
+    if (currentMonthName && lowerMessage.includes(currentMonthName)) {
+      const start = new Date(now.getFullYear(), now.getMonth(), 1);
+      const end = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+      // console.log('📅 Current month by name filter:', { start, end, month: currentMonthName });
+      return { 
+        start, 
+        end, 
+        description: `this month (${currentMonthName})` 
+      };
+    }
   }
   
   // Check for "last month"

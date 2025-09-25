@@ -18,9 +18,13 @@ export function detectUserIntent(question: string): UserIntent {
     /i\s+paid\s+\$?\d+/,
     /bought\s+.+\s+for\s+\$?\d+/,
     /spent\s+\$?\d+\s+on/,
+    /spent\s+\$?\d+\s+at/,
     /paid\s+\$?\d+\s+for/,
     /\$\d+\s+for\s+\w+/,
-    /\$\d+\s+on\s+\w+/
+    /\$\d+\s+on\s+\w+/,
+    /\$\d+\s+at\s+\w+/,
+    /^spent\s+\$?\d+/,
+    /^\$\d+\s+at\s+\w+/
   ];
   
   // Check for natural language expense first

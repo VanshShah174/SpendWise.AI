@@ -17,8 +17,7 @@ export async function handleEditConversation(
   }
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const updatedData: any = {};
+    const updatedData: Record<string, unknown> = {};
     
     switch (field) {
       case 'description':
@@ -46,11 +45,11 @@ export async function handleEditConversation(
         };
     }
 
-    // Prepare complete update data with existing values
+    // Prepare update data - only include fields that are being changed
     const completeUpdateData = {
-      text: field === 'description' ? updatedData.text : editState.originalExpense.text,
-      amount: field === 'amount' ? updatedData.amount : editState.originalExpense.amount,
-      category: field === 'category' ? updatedData.category : editState.originalExpense.category,
+      text: (field === 'description' ? updatedData.text : editState.originalExpense.text) as string,
+      amount: (field === 'amount' ? updatedData.amount : editState.originalExpense.amount) as number,
+      category: (field === 'category' ? updatedData.category : editState.originalExpense.category) as string,
       date: editState.originalExpense.date
     };
 
@@ -92,7 +91,7 @@ export async function startEditConversation(
       text: expense.text,
       amount: expense.amount,
       category: expense.category,
-      date: expense.date.toISOString().split('T')[0]
+      date: expense.date.toISOString().split('T')[0] // Store as ISO date string
     },
     timestamp: new Date(),
     userId

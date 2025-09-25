@@ -6,7 +6,7 @@ import ThemeToggle from './ThemeToggle';
 import { useState } from 'react';
 import { useChatbot } from '@/contexts/ChatbotContext';
 
-export default function Navbar() {
+function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { openChatbot, setInputMessage } = useChatbot();
 
@@ -299,3 +299,5 @@ export default function Navbar() {
     </nav>
   );
 }
+
+export default Navbar;

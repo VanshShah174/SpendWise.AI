@@ -25,7 +25,7 @@ interface ChatbotProviderProps {
   children: ReactNode;
 }
 
-export const ChatbotProvider: React.FC<ChatbotProviderProps> = ({ children }) => {
+export function ChatbotProvider({ children }: ChatbotProviderProps) {
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
 
@@ -47,4 +47,4 @@ export const ChatbotProvider: React.FC<ChatbotProviderProps> = ({ children }) =>
       {children}
     </ChatbotContext.Provider>
   );
-};
+}

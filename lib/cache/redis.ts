@@ -40,27 +40,27 @@ export function getRedisClient(): Redis | null {
   if (connectionAttempted) return redis;
   connectionAttempted = true;
 
-  console.log("🔍 REDIS DEBUG:", {
-    host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT,
-    hasPassword: !!process.env.REDIS_PASSWORD,
-    tls: process.env.REDIS_TLS
-  });
+  // console.log("🔍 REDIS DEBUG:", {
+  //   host: process.env.REDIS_HOST,
+  //   port: process.env.REDIS_PORT,
+  //   hasPassword: !!process.env.REDIS_PASSWORD,
+  //   tls: process.env.REDIS_TLS
+  // });
 
   if (!process.env.REDIS_HOST) {
-    console.log("❌ Redis not configured");
+    // console.log("❌ Redis not configured");
     return null;
   }
 
   try {
-    console.log("🔄 Creating Redis client...");
+    // console.log("🔄 Creating Redis client...");
     redis = buildRedisClient();
-    redis.on("connect", () => console.log("✅ Redis connected"));
-    redis.on("ready", () => console.log("🚀 Redis ready"));
-    redis.on("error", (err) => console.warn("❌ Redis error:", err?.message || err));
-    redis.on("end", () => console.warn("🔌 Redis connection closed"));
-    redis.on("reconnecting", () => console.log("🔄 Redis reconnecting..."));
-    console.log("✅ Redis client created, status:", redis.status);
+    // redis.on("connect", () => console.log("✅ Redis connected"));
+    // redis.on("ready", () => console.log("🚀 Redis ready"));
+    redis.on("error", (err) => console.error("Redis error:", err?.message || err));
+    // redis.on("end", () => console.warn("🔌 Redis connection closed"));
+    // redis.on("reconnecting", () => console.log("🔄 Redis reconnecting..."));
+    // console.log("✅ Redis client created, status:", redis.status);
     return redis;
   } catch (error: unknown) {
     console.warn("❌ Redis init failed:", error instanceof Error ? error.message : error);
@@ -71,26 +71,26 @@ export function getRedisClient(): Redis | null {
 
 async function isRedisConnected(client: Redis): Promise<boolean> {
   try {
-    console.log("🔍 Checking Redis status:", client.status);
+    // console.log("🔍 Checking Redis status:", client.status);
     if (client.status !== 'ready') {
-      console.log("⏳ Redis not ready, attempting connection...");
+      // console.log("⏳ Redis not ready, attempting connection...");
       await client.connect();
     }
     const result = await client.ping();
-    console.log("🏓 Redis ping result:", result);
+    // console.log("🏓 Redis ping result:", result);
     return true;
   } catch (error) {
-    console.log("❌ Redis connection failed:", error instanceof Error ? error.message : error);
+    // console.log("❌ Redis connection failed:", error instanceof Error ? error.message : error);
     return false;
   }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function cacheConversation(key: string, messages: any[] | null, ttl = 86400) {
-  console.log("💾 Caching conversation:", key);
+  // console.log("💾 Caching conversation:", key);
   const client = getRedisClient();
   if (!client || useMemoryFallback || !(await isRedisConnected(client))) {
-    console.log("🧠 Using memory cache for:", key);
+    // console.log("🧠 Using memory cache for:", key);
     setMemoryCache(key, messages, ttl);
     return true;
   }

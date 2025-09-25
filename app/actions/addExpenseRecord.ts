@@ -2,6 +2,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
 import { revalidatePath } from 'next/cache';
+import { addExpenseWithEmbedding } from '@/lib/vector/auto-embedder';
 
 interface RecordData {
   text: string;
@@ -71,6 +72,14 @@ async function addExpenseRecord(formData: FormData): Promise<RecordResult> {
         userId,
       },
     });
+
+    // Auto-create embedding for RAG
+    try {
+      await addExpenseWithEmbedding(createdRecord.id, text, amount, category, userId);
+    } catch (embeddingError) {
+      console.error('Failed to create embedding:', embeddingError);
+      // Don't fail the expense creation if embedding fails
+    }
 
     const recordData: RecordData = {
       text: createdRecord.text,
